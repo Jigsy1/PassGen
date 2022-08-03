@@ -2,56 +2,78 @@ VERSION 5.00
 Begin VB.Form frmPassGen 
    BorderStyle     =   1  'Fixed Single
    Caption         =   "Password Generator"
-   ClientHeight    =   3705
+   ClientHeight    =   4080
    ClientLeft      =   45
    ClientTop       =   330
-   ClientWidth     =   11880
+   ClientWidth     =   12000
    LinkTopic       =   "Form1"
    MaxButton       =   0   'False
-   ScaleHeight     =   3705
-   ScaleWidth      =   11880
+   ScaleHeight     =   4080
+   ScaleWidth      =   12000
    StartUpPosition =   2  'CenterScreen
+   Begin VB.CommandButton cmdSelect 
+      Caption         =   "&Select All"
+      Height          =   375
+      Left            =   2040
+      TabIndex        =   9
+      Top             =   3600
+      Width           =   1335
+   End
+   Begin VB.Timer tmrAutomatic 
+      Enabled         =   0   'False
+      Interval        =   60000
+      Left            =   9960
+      Top             =   3600
+   End
    Begin VB.Timer tmrNoteClear 
       Enabled         =   0   'False
       Interval        =   2000
-      Left            =   3000
-      Top             =   3240
+      Left            =   9480
+      Top             =   3600
    End
    Begin VB.CommandButton cmdClose 
       Caption         =   "Close"
       Height          =   375
-      Left            =   10440
-      TabIndex        =   9
-      Top             =   3240
+      Left            =   10560
+      TabIndex        =   12
+      Top             =   3600
       Width           =   1335
    End
    Begin VB.CommandButton cmdCopy 
       Caption         =   "C&opy"
       Height          =   375
-      Left            =   1560
-      TabIndex        =   7
-      Top             =   3240
+      Left            =   3480
+      TabIndex        =   10
+      Top             =   3600
       Width           =   1335
    End
    Begin VB.CommandButton cmdGenerate 
       Caption         =   "&Generate"
       Height          =   375
       Left            =   120
-      TabIndex        =   6
-      Top             =   3240
+      TabIndex        =   8
+      Top             =   3600
       Width           =   1335
    End
    Begin VB.Frame fmeString 
       Height          =   1335
       Left            =   120
-      TabIndex        =   11
-      Top             =   1800
-      Width           =   3735
+      TabIndex        =   14
+      Top             =   2040
+      Width           =   3855
+      Begin VB.CheckBox chkAutomatic 
+         Caption         =   "Automatically generate new password(s) (60s)"
+         Height          =   375
+         Left            =   120
+         TabIndex        =   7
+         Top             =   900
+         Width           =   3615
+      End
       Begin VB.ComboBox cmbLength 
          Height          =   315
          Left            =   1740
          Style           =   2  'Dropdown List
-         TabIndex        =   5
+         TabIndex        =   6
          Top             =   600
          Width           =   915
       End
@@ -59,15 +81,15 @@ Begin VB.Form frmPassGen
          Height          =   315
          Left            =   1560
          Style           =   2  'Dropdown List
-         TabIndex        =   4
+         TabIndex        =   5
          Top             =   240
          Width           =   975
       End
       Begin VB.Label lblLength 
          Caption         =   "That have a length of                        characters"
-         Height          =   375
+         Height          =   300
          Left            =   120
-         TabIndex        =   13
+         TabIndex        =   16
          Top             =   645
          Width           =   3495
       End
@@ -75,37 +97,45 @@ Begin VB.Form frmPassGen
          Caption         =   "Generate a total of                          password(s)"
          Height          =   375
          Left            =   120
-         TabIndex        =   12
+         TabIndex        =   15
          Top             =   285
          Width           =   3495
       End
    End
    Begin VB.ListBox lstPasswords 
-      Height          =   2790
-      Left            =   3960
+      Height          =   3180
+      Left            =   4080
       MultiSelect     =   2  'Extended
-      TabIndex        =   8
+      TabIndex        =   11
       Top             =   120
       Width           =   7815
    End
    Begin VB.Frame fmeSettings 
       Caption         =   "Settings:"
-      Height          =   1695
+      Height          =   1935
       Left            =   120
-      TabIndex        =   10
+      TabIndex        =   13
       Top             =   120
-      Width           =   3735
+      Width           =   3855
+      Begin VB.CheckBox chkSpaces 
+         Caption         =   "Include Spaces"
+         Height          =   375
+         Left            =   120
+         TabIndex        =   4
+         Top             =   1485
+         Width           =   3135
+      End
       Begin VB.CheckBox chkSpecialChars 
-         Caption         =   "Use Special Characters (!, "", $, etc.)"
+         Caption         =   "Include Special characters (!, "", $, etc.)"
          Height          =   315
          Left            =   120
          TabIndex        =   3
          Top             =   1200
          Value           =   1  'Checked
-         Width           =   2895
+         Width           =   3495
       End
       Begin VB.CheckBox chkNumChars 
-         Caption         =   "Use Numbers"
+         Caption         =   "Include Numbers"
          Height          =   375
          Left            =   120
          TabIndex        =   2
@@ -114,7 +144,7 @@ Begin VB.Form frmPassGen
          Width           =   2895
       End
       Begin VB.CheckBox chkUpperChars 
-         Caption         =   "Use Uppercase characters"
+         Caption         =   "Include Uppercase characters"
          Height          =   315
          Left            =   120
          TabIndex        =   0
@@ -123,7 +153,7 @@ Begin VB.Form frmPassGen
          Width           =   2895
       End
       Begin VB.CheckBox chkLowerChars 
-         Caption         =   "Use Lowercase characters"
+         Caption         =   "Include Lowercase characters"
          Height          =   315
          Left            =   120
          TabIndex        =   1
@@ -138,6 +168,14 @@ Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = True
 Attribute VB_Exposed = False
+Private Sub chkAutomatic_Click()
+  If chkAutomatic.Value = 1 Then
+    tmrAutomatic.Enabled = True
+  Else
+    tmrAutomatic.Enabled = False
+  End If
+End Sub
+
 Private Sub cmdClose_Click()
   End
 End Sub
@@ -161,6 +199,7 @@ End Sub
 Private Sub cmdGenerate_Click()
   If chkUpperChars.Value = 0 And chkLowerChars.Value = 0 And chkNumChars.Value = 0 And chkSpecialChars.Value = 0 Then
     MsgBox "Please select at least one option", vbExclamation, "Error"
+    ' Do not include chkSpace here because it would offer no differences.
   Else
     Call makePass(cmbNumber.Text, cmbLength.Text)
   End If
@@ -182,6 +221,10 @@ Private Function makePass(passCount As Integer, inputLength As Variant) As Strin
     baseString = baseString & "!&'*+-./:;<=>?@\^_`~#$%,|()[]{}" & Chr(34)
     ' `-> Chr(34) is "
   End If
+  If chkSpaces.Value = 1 Then
+    baseString = baseString & Chr(32)
+    ' `-> Chr(32) is <SPACE>
+  End If
   Dim isRand As Integer
   isRand = 0
   If inputLength = "Rand" Then
@@ -201,8 +244,19 @@ Private Function makePass(passCount As Integer, inputLength As Variant) As Strin
     lstPasswords.AddItem outString
   Next makeNumber
   ' `-> The random letter aspect was originally part of a separate function. However, it kept making a weird pattern in the
-  '     copying tests to notepad. (If you've ever seen the Malbolge code for "100 bottles of beer" you'll understand what I mean.)
+  '     copying tests to notepad. (If you've ever seen the Malbolge code for "99 bottles of beer" you'll understand what I mean.)
 End Function
+
+Private Sub cmdSelect_Click()
+  If lstPasswords.ListCount > 0 Then
+    Dim loopNumber As Integer
+    For loopNumber = 0 To lstPasswords.ListCount - 1
+      lstPasswords.Selected(loopNumber) = True
+    Next
+  Else
+    MsgBox "There is nothing to select", vbExclamation, "Error"
+  End If
+End Sub
 
 Private Sub Form_Load()
   Me.Tag = Me.Caption
@@ -227,6 +281,10 @@ End Sub
 Private Sub Form_Unload(Cancel As Integer)
   End
   ' `-> I doubt this has any use; but just incase...
+End Sub
+
+Private Sub tmrAutomatic_Timer()
+  Call makePass(cmbNumber.Text, cmbLength.Text)
 End Sub
 
 Private Sub tmrNoteClear_Timer()
