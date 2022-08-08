@@ -179,6 +179,12 @@ Begin VB.Form frmPassGen
          Index           =   1
       End
    End
+   Begin VB.Menu Settings 
+      Caption         =   "&Settings"
+      Begin VB.Menu Override 
+         Caption         =   "&Override"
+      End
+   End
 End
 Attribute VB_Name = "frmPassGen"
 Attribute VB_GlobalNameSpace = False
@@ -223,6 +229,11 @@ Public useLeftBrace As Integer
 Public useRightBrace As Integer
 Public useQuote As Integer
 Public useUnderscore As Integer
+
+Public defaultMaxPassLen As Integer
+Public maxPassLen As Integer
+Public minPassLen As Integer
+Public moreRandomness As Integer
 
 Private Sub chkAutomatic_Click()
   If chkAutomatic.Value = 1 Then
@@ -401,15 +412,24 @@ Private Function makePass(passCount As Integer, inputLength As Variant) As Strin
   End If
   lstPasswords.Clear
   Randomize
-  Dim makeNumber As Integer, outString As String
+  Dim makeNumber As Integer, randNumber As Integer, outString As String
   For makeNumber = 0 To passCount - 1
     outString = ""
     Dim LengthNumber As Integer
     If isRand = 1 Then
-      inputLength = Int(Val(8 + Val(Rnd * 56)))
+      inputLength = Int(Val(minPassLen + Val(Rnd * Val(maxPassLen - Val(minPassLen - 1)))))
     End If
     For LengthNumber = 0 To inputLength - 1
-      outString = outString & Mid(baseString, Int(Val(1 + Val(Rnd * Len(baseString)))), 1)
+      If moreRandomness = 1 Then
+        randNumber = Int(Val(1 + Val(Rnd * 2)))
+        If randNumber = 1 Then
+          outString = outString & Mid(baseString, Int(Val(1 + Val(Rnd * Len(baseString)))), 1)
+        Else
+          outString = outString & Mid(StrReverse(baseString), Int(Val(1 + Val(Rnd * Len(StrReverse(baseString))))), 1)
+        End If
+      Else
+        outString = outString & Mid(baseString, Int(Val(1 + Val(Rnd * Len(baseString)))), 1)
+      End If
     Next LengthNumber
     lstPasswords.AddItem outString
   Next makeNumber
@@ -466,19 +486,42 @@ Private Sub Form_Load()
   useRightBrace = 1
   useQuote = 1
   useUnderscore = 1
+  maxPassLen = 64
+  defaultMaxPassLen = 64
+  ' `-> Fallback if unsetting.
+  minPassLen = 8
+  ' `-> WARNING!: DO NOT CHANGE THIS!
+  moreRandomness = 0
   Call makeSpecialString
-  Dim loadCountNumber As Integer, loadLengthNumber As Integer
+  Dim loadCountNumber As Integer
   For loadCountNumber = 1 To 1024
     cmbNumber.AddItem loadCountNumber
   Next loadCountNumber
-  For loadLengthNumber = 8 To 64
+  cmbNumber.Text = "64"
+  Call addLenNumbers
+End Sub
+
+Public Function addLenNumbers()
+  If IsNull(cmbLength.Text) = False And cmbLength.Text <> "" Then
+    If IsNumeric(cmbLength.Text) = True Then
+      If cmbLength.Text > maxPassLen Then
+        cmbLength.Tag = "16"
+      Else
+        cmbLength.Tag = cmbLength.Text
+      End If
+    Else
+      cmbLength.Tag = cmbLength.Text
+    End If
+  End If
+  cmbLength.Clear
+  Dim loadLengthNumber As Integer
+  For loadLengthNumber = minPassLen To maxPassLen
     cmbLength.AddItem loadLengthNumber
   Next loadLengthNumber
   cmbLength.AddItem "Rand"
-  cmbNumber.Text = "64"
-  cmbLength.Text = "16"
+  cmbLength.Text = IIf(IsNull(cmbLength.Tag) = False And cmbLength.Tag <> "", cmbLength.Tag, 16)
   ' `-> The minimum is 8, but nobody should really be using sub 16 character passwords in 2022.
-End Sub
+End Function
 
 Private Sub Form_Terminate()
   End
@@ -492,6 +535,10 @@ End Sub
 
 Private Sub menuExit_Click(Index As Integer)
   End
+End Sub
+
+Private Sub Override_Click()
+  frmOverride.Visible = True
 End Sub
 
 Private Sub tmrAutomatic_Timer()
