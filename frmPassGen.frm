@@ -2,69 +2,88 @@ VERSION 5.00
 Begin VB.Form frmPassGen 
    BorderStyle     =   1  'Fixed Single
    Caption         =   "Password Generator"
-   ClientHeight    =   3600
+   ClientHeight    =   3960
    ClientLeft      =   45
    ClientTop       =   615
    ClientWidth     =   12000
    LinkTopic       =   "Form1"
    MaxButton       =   0   'False
    MinButton       =   0   'False
-   ScaleHeight     =   3600
+   ScaleHeight     =   3960
    ScaleWidth      =   12000
    StartUpPosition =   2  'CenterScreen
    Begin VB.CommandButton cmdSelect 
       Caption         =   "&Select All"
       Height          =   375
       Left            =   2040
-      TabIndex        =   10
-      Top             =   3120
+      TabIndex        =   12
+      Top             =   3480
       Width           =   1335
    End
    Begin VB.Timer tmrAutomatic 
       Enabled         =   0   'False
       Interval        =   60000
       Left            =   9960
-      Top             =   3120
+      Top             =   3480
    End
    Begin VB.Timer tmrNoteClear 
       Enabled         =   0   'False
       Interval        =   2000
       Left            =   9480
-      Top             =   3120
+      Top             =   3480
    End
    Begin VB.CommandButton cmdClose 
       Caption         =   "&Close"
       Height          =   375
       Left            =   10560
-      TabIndex        =   13
-      Top             =   3120
+      TabIndex        =   15
+      Top             =   3480
       Width           =   1335
    End
    Begin VB.CommandButton cmdCopy 
       Caption         =   "C&opy"
       Height          =   375
       Left            =   3480
-      TabIndex        =   11
-      Top             =   3120
+      TabIndex        =   13
+      Top             =   3480
       Width           =   1335
    End
    Begin VB.CommandButton cmdGenerate 
       Caption         =   "&Generate"
       Height          =   375
       Left            =   120
-      TabIndex        =   9
-      Top             =   3120
+      TabIndex        =   11
+      Top             =   3480
       Width           =   1335
    End
    Begin VB.Frame fmeString 
-      Height          =   1335
+      Height          =   1695
       Left            =   120
-      TabIndex        =   15
+      TabIndex        =   17
       Top             =   1680
       Width           =   3855
+      Begin VB.ComboBox cmbPIM 
+         Height          =   315
+         ItemData        =   "frmPassGen.frx":0000
+         Left            =   2760
+         List            =   "frmPassGen.frx":0013
+         Style           =   2  'Dropdown List
+         TabIndex        =   10
+         Top             =   1240
+         Width           =   975
+      End
+      Begin VB.CheckBox chkPIM 
+         Caption         =   "Include a random PIM from 1 to "
+         Height          =   255
+         Left            =   120
+         TabIndex        =   9
+         ToolTipText     =   "For use in VeraCrypt"
+         Top             =   1290
+         Width           =   3615
+      End
       Begin VB.CheckBox chkAutomatic 
          Caption         =   "Automatically generate new password(s) (60s)"
-         Height          =   315
+         Height          =   255
          Left            =   120
          TabIndex        =   8
          Top             =   960
@@ -90,7 +109,7 @@ Begin VB.Form frmPassGen
          Caption         =   "That are a length of                              characters"
          Height          =   255
          Left            =   120
-         TabIndex        =   17
+         TabIndex        =   19
          Top             =   640
          Width           =   3615
       End
@@ -98,16 +117,16 @@ Begin VB.Form frmPassGen
          Caption         =   "Generate a total of                                password(s)"
          Height          =   255
          Left            =   120
-         TabIndex        =   16
+         TabIndex        =   18
          Top             =   280
          Width           =   3615
       End
    End
    Begin VB.ListBox lstPasswords 
-      Height          =   2790
+      Height          =   3180
       Left            =   4080
       MultiSelect     =   2  'Extended
-      TabIndex        =   12
+      TabIndex        =   14
       Top             =   120
       Width           =   7815
    End
@@ -115,7 +134,7 @@ Begin VB.Form frmPassGen
       Caption         =   "Settings:"
       Height          =   1575
       Left            =   120
-      TabIndex        =   14
+      TabIndex        =   16
       Top             =   120
       Width           =   3855
       Begin VB.CommandButton cmdSpecial 
@@ -235,6 +254,9 @@ Public maxPassLen As Integer
 Public minPassLen As Integer
 Public moreRandomness As Integer
 
+Public defaultPIM As Integer
+
+
 Private Sub chkAutomatic_Click()
   If chkAutomatic.Value = 1 Then
     tmrAutomatic.Enabled = True
@@ -255,19 +277,24 @@ Private Sub cmdClose_Click()
 End Sub
 
 Private Sub cmdCopy_Click()
-  If lstPasswords.SelCount > 0 Then
-    Clipboard.Clear
-    Dim selectNumber As Integer
-    For selectNumber = 0 To lstPasswords.ListCount - 1
-      If lstPasswords.Selected(selectNumber) = True Then
-        Clipboard.SetText Clipboard.GetText & lstPasswords.List(selectNumber) & vbNewLine
-      End If
-    Next
-    Me.Caption = Me.Caption & " - Copied to clipboard"
-    tmrNoteClear.Enabled = True
-  Else
-    MsgBox "Please select at least one password to copy.", vbExclamation, "Error"
-  End If
+  On Error GoTo endCopy
+    If lstPasswords.SelCount > 0 Then
+      Clipboard.Clear
+      Dim selectNumber As Integer
+      For selectNumber = 0 To lstPasswords.ListCount - 1
+        If lstPasswords.Selected(selectNumber) = True Then
+          Clipboard.SetText Clipboard.GetText & lstPasswords.List(selectNumber) & vbNewLine
+        End If
+      Next
+      Me.Caption = Me.Caption & " - Copied to clipboard"
+      tmrNoteClear.Enabled = True
+    Else
+      MsgBox "Please select at least one password to copy.", vbExclamation, "Error"
+    End If
+    Exit Sub
+
+endCopy:
+  MsgBox "Failed to copy to clipboard.", vbExclamation, "Error"
 End Sub
 
 Private Sub cmdGenerate_Click()
@@ -431,6 +458,18 @@ Private Function makePass(passCount As Integer, inputLength As Variant) As Strin
         outString = outString & Mid(baseString, Int(Val(1 + Val(Rnd * Len(baseString)))), 1)
       End If
     Next LengthNumber
+    If chkPIM.Value = 1 Then
+      If Len(outString) <= 64 Then
+        ' `-> VeraCrypt length is limited to 64 characters. There is no point to including a PIM if it's longer than that.
+        If Len(outString) >= 20 Then
+          outString = outString & " ---------- " & Int(Val(1 + Val(Rnd * cmbPIM.Text)))
+        Else
+          If cmbPIM.Text > defaultPIM Then
+            outString = outString & " ---------- " & Int(Val(defaultPIM + Val(Rnd * Val(cmbPIM.Text - Val(defaultPIM - 1)))))
+          End If
+        End If
+      End If
+    End If
     lstPasswords.AddItem outString
   Next makeNumber
   ' `-> The random letter aspect was originally part of a separate function. However, it kept making a weird pattern in the
@@ -492,6 +531,9 @@ Private Sub Form_Load()
   minPassLen = 8
   ' `-> WARNING!: DO NOT CHANGE THIS!
   moreRandomness = 0
+  defaultPIM = 485
+  ' `-> VeraCrypt use.
+  '     It's actually 98 if you use sha512 or Whirlpool, but since I have no way of telling that, I'll use the 2nd default.
   Call makeSpecialString
   Dim loadCountNumber As Integer
   For loadCountNumber = 1 To 1024
@@ -499,6 +541,7 @@ Private Sub Form_Load()
   Next loadCountNumber
   cmbNumber.Text = "64"
   Call addLenNumbers
+  cmbPIM.Text = "1024"
 End Sub
 
 Public Function addLenNumbers()
