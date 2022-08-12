@@ -4,7 +4,7 @@ A very simple password generator [modelled after one I wrote](https://i.imgur.co
 
 I lost the source code for the original version, so I ended up remaking this one from scratch in a few hours.
 
-![PassGen_v4](https://user-images.githubusercontent.com/34282672/183461141-d93a01da-c884-47db-93bb-4f50ab25c2fd.png)
+![pwgen](https://user-images.githubusercontent.com/34282672/184308735-feca8c4a-72d4-4a17-84e0-e5527a326d69.png)
 
 ![PassGen_SP](https://user-images.githubusercontent.com/34282672/183461169-3ebc2c84-bd86-4868-9c34-b8854457fae6.png)
 
