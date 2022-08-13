@@ -31,6 +31,7 @@ Begin VB.Form frmOverride
          Height          =   315
          Left            =   120
          TabIndex        =   3
+         ToolTipText     =   "Note: This could be a good thing or bad thing depending on randomness"
          Top             =   960
          Width           =   3135
       End

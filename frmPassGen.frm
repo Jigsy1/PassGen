@@ -8,7 +8,6 @@ Begin VB.Form frmPassGen
    ClientWidth     =   12000
    LinkTopic       =   "Form1"
    MaxButton       =   0   'False
-   MinButton       =   0   'False
    ScaleHeight     =   3960
    ScaleWidth      =   12000
    StartUpPosition =   2  'CenterScreen
@@ -77,7 +76,7 @@ Begin VB.Form frmPassGen
          Height          =   255
          Left            =   120
          TabIndex        =   9
-         ToolTipText     =   "For use in VeraCrypt"
+         ToolTipText     =   "Note: For when making VeraCrypt file(s)/volume(s)"
          Top             =   1290
          Width           =   3615
       End
@@ -154,7 +153,7 @@ Begin VB.Form frmPassGen
          Width           =   3615
       End
       Begin VB.CheckBox chkSpecialChars 
-         Caption         =   "Include Special characters (!, "", $, etc.)"
+         Caption         =   "Include Special characters (!, "", #, etc.)"
          Height          =   255
          Left            =   120
          TabIndex        =   3
@@ -212,14 +211,21 @@ Attribute VB_PredeclaredId = True
 Attribute VB_Exposed = False
 Option Explicit
 
-' ,-> Special characters
+' ,-> Global variable(s).
 Public specialString As String
 
 Public useExclamation As Integer
+Public useQuote As Integer
+Public useHash As Integer
+Public useDollar As Integer
+Public usePercent As Integer
 Public useAmpersand As Integer
 Public useApostrophe As Integer
+Public useLeftParenthesis As Integer
+Public useRightParenthesis As Integer
 Public useAsterisk As Integer
 Public usePlus As Integer
+Public useComma As Integer
 Public useMinus As Integer
 Public usePeriod As Integer
 Public useForwardSlash As Integer
@@ -230,32 +236,148 @@ Public useEquals As Integer
 Public useGreaterThan As Integer
 Public useQuestion As Integer
 Public useAtSign As Integer
-Public useBackSlash As Integer
-Public usePower As Integer
-Public useGrave As Integer
-' `-> `
-Public useTilde As Integer
-Public useHash As Integer
-Public useDollar As Integer
-Public usePercent As Integer
-Public useComma As Integer
-Public usePipe As Integer
-Public useLeftParent As Integer
-Public useRightParent As Integer
 Public useLeftBracket As Integer
+Public useBackSlash As Integer
 Public useRightBracket As Integer
-Public useLeftBrace As Integer
-Public useRightBrace As Integer
-Public useQuote As Integer
+Public usePower As Integer
 Public useUnderscore As Integer
+Public useGrave As Integer
+' `-> Note: `
+Public useLeftBrace As Integer
+Public usePipe As Integer
+Public useRightBrace As Integer
+Public useTilde As Integer
+' `-> ASCII table order.
 
 Public defaultMaxPassLen As Integer
+Public defaultPIM As Integer
 Public maxPassLen As Integer
 Public minPassLen As Integer
 Public moreRandomness As Integer
 
-Public defaultPIM As Integer
+' ,-> Code:
 
+Public Function addLenNumbers()
+  If IsNull(cmbLength.Text) = False And cmbLength.Text <> "" Then
+    If IsNumeric(cmbLength.Text) = True Then
+      If cmbLength.Text > maxPassLen Then
+        cmbLength.Tag = "16"
+      Else
+        cmbLength.Tag = cmbLength.Text
+      End If
+    Else
+      cmbLength.Tag = cmbLength.Text
+    End If
+  End If
+  cmbLength.Clear
+  Dim lengthNumber As Integer
+  For lengthNumber = minPassLen To maxPassLen
+    cmbLength.AddItem lengthNumber
+  Next lengthNumber
+  cmbLength.AddItem "Rand"
+  cmbLength.Text = IIf(IsNull(cmbLength.Tag) = False And cmbLength.Tag <> "", cmbLength.Tag, 16)
+  ' `-> The minimum is 8, but nobody should really be using sub 16 character passwords in 2022.
+End Function
+
+Private Function makePass(passCount As Integer, inputLength As Variant)
+  Randomize
+  Dim baseString As String
+  If chkUpperChars.Value = 1 Then baseString = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+  If chkLowerChars.Value = 1 Then baseString = baseString & "abcdefghijklmnopqrstuvwxyz"
+  If chkNumChars.Value = 1 Then baseString = baseString & "0123456789"
+  If chkSpecialChars.Value = 1 Then
+    If IsNull(specialString) = False Or specialString <> "" Then baseString = baseString & specialString
+  End If
+  If chkSpaces.Value = 1 Then baseString = baseString & Chr(32)
+  ' `-> Chr(32) is <SPACE>
+  Dim isRand As Integer
+  isRand = 0
+  If inputLength = "Rand" Then
+    isRand = 1
+  End If
+  lstPasswords.Clear
+  Dim makeNumber As Integer, outString As String, randNumber As Integer
+  For makeNumber = 0 To passCount - 1
+    outString = ""
+    Dim lengthNumber As Integer
+    If isRand = 1 Then inputLength = Int(Val(minPassLen + Val(Rnd * Val(maxPassLen - Val(minPassLen - 1)))))
+    For lengthNumber = 0 To inputLength - 1
+      If moreRandomness = 1 Then
+        randNumber = Int(Val(1 + Val(Rnd * 4)))
+        Select Case randNumber
+          Case 1
+            outString = outString & Mid(baseString, Int(Val(1 + Val(Rnd * Len(baseString)))), 1)
+          Case 2
+            outString = outString & Mid(StrReverse(baseString), Int(Val(1 + Val(Rnd * Len(StrReverse(baseString))))), 1)
+          Case 3
+            ' ,-> Former half
+            outString = outString & Mid(Mid(baseString, 1, Val(Len(baseString) / 2)), Int(Val(1 + Val(Rnd * Len(Mid(baseString, 1, Val(Len(baseString) / 2)))))), 1)
+          Case 4
+            ' ,-> Latter half
+            outString = outString & Mid(Mid(baseString, Val(Len(baseString) / 2)), Int(Val(1 + Val(Rnd * Len(Mid(baseString, Val(Len(baseString) / 2)))))), 1)
+        End Select
+      Else
+        outString = outString & Mid(baseString, Int(Val(1 + Val(Rnd * Len(baseString)))), 1)
+      End If
+    Next lengthNumber
+    If chkPIM.Value = 1 Then
+      If Len(outString) <= 64 Then
+        ' `-> VeraCrypt length is limited to 64 characters. There is no point to including a PIM if it's longer than that.
+        If Len(outString) >= 20 Then
+          outString = outString & " ---------- " & Int(Val(1 + Val(Rnd * cmbPIM.Text)))
+        Else
+          If cmbPIM.Text > defaultPIM Then
+            outString = outString & " ---------- " & Int(Val(defaultPIM + Val(Rnd * Val(cmbPIM.Text - Val(defaultPIM - 1)))))
+          End If
+        End If
+      End If
+    End If
+    lstPasswords.AddItem outString
+  Next makeNumber
+End Function
+
+Public Function makeSpecialString() As String
+  Dim baseString As String
+  If useExclamation = 1 Then baseString = "!"
+  If useQuote = 1 Then baseString = baseString & Chr(34)
+  If useHash = 1 Then baseString = baseString & "#"
+  If useDollar = 1 Then baseString = baseString & "$"
+  If usePercent = 1 Then baseString = baseString & "%"
+  If useAmpersand = 1 Then baseString = baseString & "&"
+  If useApostrophe = 1 Then baseString = baseString & "'"
+  If useLeftParenthesis = 1 Then baseString = baseString & "("
+  If useRightParenthesis = 1 Then baseString = baseString & ")"
+  If useAsterisk = 1 Then baseString = baseString & "*"
+  If usePlus = 1 Then baseString = baseString & "+"
+  If useComma = 1 Then baseString = baseString & ","
+  If useMinus = 1 Then baseString = baseString & "-"
+  If usePeriod = 1 Then baseString = baseString & "."
+  If useForwardSlash = 1 Then baseString = baseString & "/"
+  If useColon = 1 Then baseString = baseString & ":"
+  If useSemiColon = 1 Then baseString = baseString & ";"
+  If useLessThan = 1 Then baseString = baseString & "<"
+  If useEquals = 1 Then baseString = baseString & "="
+  If useGreaterThan = 1 Then baseString = baseString & ">"
+  If useQuestion = 1 Then baseString = baseString & "?"
+  If useAtSign = 1 Then baseString = baseString & "@"
+  If useLeftBracket = 1 Then baseString = baseString & "["
+  If useBackSlash = 1 Then baseString = baseString & "\"
+  If useRightBracket = 1 Then baseString = baseString & "]"
+  If usePower = 1 Then baseString = baseString & "^"
+  If useUnderscore = 1 Then baseString = baseString & "_"
+  If useGrave = 1 Then baseString = baseString & "`"
+  If useLeftBrace = 1 Then baseString = baseString & "{"
+  If usePipe = 1 Then baseString = baseString & "|"
+  If useRightBrace = 1 Then baseString = baseString & "}"
+  If useTilde = 1 Then baseString = baseString & "~"
+  ' `-> ASCII table order.
+  specialString = baseString
+  If IsNull(baseString) = True Or baseString = "" Then
+    chkSpecialChars.Value = 0
+  Else
+    chkSpecialChars.Value = 1
+  End If
+End Function
 
 Private Sub chkAutomatic_Click()
   If chkAutomatic.Value = 1 Then
@@ -280,10 +402,10 @@ Private Sub cmdCopy_Click()
   On Error GoTo endCopy
     If lstPasswords.SelCount > 0 Then
       Clipboard.Clear
-      Dim selectNumber As Integer
-      For selectNumber = 0 To lstPasswords.ListCount - 1
-        If lstPasswords.Selected(selectNumber) = True Then
-          Clipboard.SetText Clipboard.GetText & lstPasswords.List(selectNumber) & vbNewLine
+      Dim selectedNumber As Integer
+      For selectedNumber = 0 To lstPasswords.ListCount - 1
+        If lstPasswords.Selected(selectedNumber) = True Then
+          Clipboard.SetText Clipboard.GetText & lstPasswords.List(selectedNumber) & vbNewLine
         End If
       Next
       Me.Caption = Me.Caption & " - Copied to clipboard"
@@ -306,176 +428,6 @@ Private Sub cmdGenerate_Click()
   End If
 End Sub
 
-Public Function makeSpecialString() As String
-  Dim baseString As String
-  If useExclamation = 1 Then
-    baseString = "!"
-  End If
-  If useAmpersand = 1 Then
-    baseString = baseString & "&"
-  End If
-  If useApostrophe = 1 Then
-    baseString = baseString & "'"
-  End If
-  If useAsterisk = 1 Then
-    baseString = baseString & "*"
-  End If
-  If usePlus = 1 Then
-    baseString = baseString & "+"
-  End If
-  If useMinus = 1 Then
-    baseString = baseString & "-"
-  End If
-  If usePeriod = 1 Then
-    baseString = baseString & "."
-  End If
-  If useForwardSlash = 1 Then
-    baseString = baseString & "/"
-  End If
-  If useColon = 1 Then
-    baseString = baseString & ":"
-  End If
-  If useSemiColon = 1 Then
-    baseString = baseString & ";"
-  End If
-  If useLessThan = 1 Then
-    baseString = baseString & "<"
-  End If
-  If useEquals = 1 Then
-    baseString = baseString & "="
-  End If
-  If useGreaterThan = 1 Then
-    baseString = baseString & ">"
-  End If
-  If useQuestion = 1 Then
-    baseString = baseString & "?"
-  End If
-  If useAtSign = 1 Then
-    baseString = baseString & "@"
-  End If
-  If useBackSlash = 1 Then
-    baseString = baseString & "\"
-  End If
-  If usePower = 1 Then
-    baseString = baseString & "^"
-  End If
-  If useGrave = 1 Then
-    baseString = baseString & "`"
-  End If
-  If useTilde = 1 Then
-    baseString = baseString & "~"
-  End If
-  If useHash = 1 Then
-    baseString = baseString & "#"
-  End If
-  If useDollar = 1 Then
-    baseString = baseString & "$"
-  End If
-  If usePercent = 1 Then
-    baseString = baseString & "%"
-  End If
-  If useComma = 1 Then
-    baseString = baseString & ","
-  End If
-  If usePipe = 1 Then
-    baseString = baseString & "|"
-  End If
-  If useLeftParent = 1 Then
-    baseString = baseString & "("
-  End If
-  If useRightParent = 1 Then
-    baseString = baseString & ")"
-  End If
-  If useLeftBracket = 1 Then
-    baseString = baseString & "["
-  End If
-  If useRightBracket = 1 Then
-    baseString = baseString & "]"
-  End If
-  If useLeftBrace = 1 Then
-    baseString = baseString & "{"
-  End If
-  If useRightBrace = 1 Then
-    baseString = baseString & "}"
-  End If
-  If useQuote = 1 Then
-    baseString = baseString & Chr(34)
-  End If
-  If useUnderscore = 1 Then
-    baseString = baseString & "_"
-  End If
-  specialString = baseString
-  If IsNull(baseString) = True Or baseString = "" Then
-    chkSpecialChars.Value = 0
-  Else
-    chkSpecialChars.Value = 1
-  End If
-End Function
-
-Private Function makePass(passCount As Integer, inputLength As Variant) As String
-  Dim baseString As String
-  If chkUpperChars.Value = 1 Then
-    baseString = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-  End If
-  If chkLowerChars.Value = 1 Then
-    baseString = baseString & "abcdefghijklmnopqrstuvwxyz"
-  End If
-  If chkNumChars.Value = 1 Then
-    baseString = baseString & "0123456789"
-  End If
-  If chkSpecialChars.Value = 1 Then
-    If IsNull(specialString) = False Or specialString <> "" Then
-      baseString = baseString & specialString
-    End If
-  End If
-  If chkSpaces.Value = 1 Then
-    baseString = baseString & Chr(32)
-    ' `-> Chr(32) is <SPACE>
-  End If
-  Dim isRand As Integer
-  isRand = 0
-  If inputLength = "Rand" Then
-    isRand = 1
-  End If
-  lstPasswords.Clear
-  Randomize
-  Dim makeNumber As Integer, randNumber As Integer, outString As String
-  For makeNumber = 0 To passCount - 1
-    outString = ""
-    Dim LengthNumber As Integer
-    If isRand = 1 Then
-      inputLength = Int(Val(minPassLen + Val(Rnd * Val(maxPassLen - Val(minPassLen - 1)))))
-    End If
-    For LengthNumber = 0 To inputLength - 1
-      If moreRandomness = 1 Then
-        randNumber = Int(Val(1 + Val(Rnd * 2)))
-        If randNumber = 1 Then
-          outString = outString & Mid(baseString, Int(Val(1 + Val(Rnd * Len(baseString)))), 1)
-        Else
-          outString = outString & Mid(StrReverse(baseString), Int(Val(1 + Val(Rnd * Len(StrReverse(baseString))))), 1)
-        End If
-      Else
-        outString = outString & Mid(baseString, Int(Val(1 + Val(Rnd * Len(baseString)))), 1)
-      End If
-    Next LengthNumber
-    If chkPIM.Value = 1 Then
-      If Len(outString) <= 64 Then
-        ' `-> VeraCrypt length is limited to 64 characters. There is no point to including a PIM if it's longer than that.
-        If Len(outString) >= 20 Then
-          outString = outString & " ---------- " & Int(Val(1 + Val(Rnd * cmbPIM.Text)))
-        Else
-          If cmbPIM.Text > defaultPIM Then
-            outString = outString & " ---------- " & Int(Val(defaultPIM + Val(Rnd * Val(cmbPIM.Text - Val(defaultPIM - 1)))))
-          End If
-        End If
-      End If
-    End If
-    lstPasswords.AddItem outString
-  Next makeNumber
-  ' `-> The random letter aspect was originally part of a separate function. However, it kept making a weird pattern in the
-  '     copying tests to notepad. (If you've ever seen the Malbolge code for "99 bottles of beer" you'll understand what I mean.)
-End Function
-
 Private Sub cmdSelect_Click()
   If lstPasswords.ListCount > 0 Then
     Dim loopNumber As Integer
@@ -493,11 +445,19 @@ End Sub
 
 Private Sub Form_Load()
   Me.Tag = Me.Caption
+  ' ,-> Set the global variable(s).
   useExclamation = 1
+  useQuote = 1
+  useHash = 1
+  useDollar = 1
+  usePercent = 1
   useAmpersand = 1
   useApostrophe = 1
+  useLeftParenthesis = 1
+  useRightParenthesis = 1
   useAsterisk = 1
   usePlus = 1
+  useComma = 1
   useMinus = 1
   usePeriod = 1
   useForwardSlash = 1
@@ -508,63 +468,35 @@ Private Sub Form_Load()
   useGreaterThan = 1
   useQuestion = 1
   useAtSign = 1
-  useBackSlash = 1
-  usePower = 1
-  useGrave = 1
-  useTilde = 1
-  useHash = 1
-  useDollar = 1
-  usePercent = 1
-  useComma = 1
-  usePipe = 1
-  useLeftParent = 1
-  useRightParent = 1
   useLeftBracket = 1
+  useBackSlash = 1
   useRightBracket = 1
-  useLeftBrace = 1
-  useRightBrace = 1
-  useQuote = 1
+  usePower = 1
   useUnderscore = 1
-  maxPassLen = 64
+  useGrave = 1
+  useLeftBrace = 1
+  usePipe = 1
+  useRightBrace = 1
+  useTilde = 1
+  ' `-> ASCII table order.
   defaultMaxPassLen = 64
-  ' `-> Fallback if unsetting.
+  ' `-> Fallback if unsetting from 128, etc.
+  defaultPIM = 485
+  ' `-> For use when making VeraCrypt file(s)/volume(s).
+  '     The default is actually 98 if you use sha512 or Whirlpool, but since I have no way of telling that, I'll use the 2nd default.
+  maxPassLen = 64
   minPassLen = 8
   ' `-> WARNING!: DO NOT CHANGE THIS!
   moreRandomness = 0
-  defaultPIM = 485
-  ' `-> VeraCrypt use.
-  '     It's actually 98 if you use sha512 or Whirlpool, but since I have no way of telling that, I'll use the 2nd default.
   Call makeSpecialString
-  Dim loadCountNumber As Integer
-  For loadCountNumber = 1 To 1024
-    cmbNumber.AddItem loadCountNumber
-  Next loadCountNumber
+  Dim countNumber As Integer
+  For countNumber = 1 To 1024
+    cmbNumber.AddItem countNumber
+  Next countNumber
   cmbNumber.Text = "64"
   Call addLenNumbers
   cmbPIM.Text = "1024"
 End Sub
-
-Public Function addLenNumbers()
-  If IsNull(cmbLength.Text) = False And cmbLength.Text <> "" Then
-    If IsNumeric(cmbLength.Text) = True Then
-      If cmbLength.Text > maxPassLen Then
-        cmbLength.Tag = "16"
-      Else
-        cmbLength.Tag = cmbLength.Text
-      End If
-    Else
-      cmbLength.Tag = cmbLength.Text
-    End If
-  End If
-  cmbLength.Clear
-  Dim loadLengthNumber As Integer
-  For loadLengthNumber = minPassLen To maxPassLen
-    cmbLength.AddItem loadLengthNumber
-  Next loadLengthNumber
-  cmbLength.AddItem "Rand"
-  cmbLength.Text = IIf(IsNull(cmbLength.Tag) = False And cmbLength.Tag <> "", cmbLength.Tag, 16)
-  ' `-> The minimum is 8, but nobody should really be using sub 16 character passwords in 2022.
-End Function
 
 Private Sub Form_Terminate()
   End

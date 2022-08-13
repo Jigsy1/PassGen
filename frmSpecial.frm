@@ -15,7 +15,7 @@ Begin VB.Form frmSpecial
       Caption         =   "&Include All"
       Height          =   375
       Left            =   120
-      TabIndex        =   33
+      TabIndex        =   32
       Top             =   2760
       Width           =   1215
    End
@@ -23,7 +23,7 @@ Begin VB.Form frmSpecial
       Caption         =   "&OK"
       Height          =   375
       Left            =   3960
-      TabIndex        =   34
+      TabIndex        =   33
       Top             =   2760
       Width           =   1215
    End
@@ -31,298 +31,296 @@ Begin VB.Form frmSpecial
       Caption         =   "Include:"
       Height          =   2535
       Left            =   120
-      TabIndex        =   0
+      TabIndex        =   34
       Top             =   120
       Width           =   5055
       Begin VB.CheckBox chkUnderscore 
          Caption         =   "_"
          Height          =   255
-         Left            =   3840
-         TabIndex        =   32
-         Top             =   1200
+         Left            =   2640
+         TabIndex        =   26
+         Top             =   2160
          Value           =   1  'Checked
-         Width           =   855
+         Width           =   1095
       End
       Begin VB.CheckBox chkQuote 
          Caption         =   """"
          Height          =   255
-         Left            =   3840
-         TabIndex        =   31
-         Top             =   960
+         Left            =   240
+         TabIndex        =   1
+         Top             =   480
          Value           =   1  'Checked
-         Width           =   855
+         Width           =   1095
       End
       Begin VB.CheckBox chkRightBrace 
          Caption         =   "}"
          Height          =   255
          Left            =   3840
          TabIndex        =   30
-         Top             =   720
+         Top             =   960
          Value           =   1  'Checked
-         Width           =   855
+         Width           =   1095
       End
       Begin VB.CheckBox chkLeftBrace 
          Caption         =   "{"
          Height          =   255
          Left            =   3840
-         TabIndex        =   29
+         TabIndex        =   28
          Top             =   480
          Value           =   1  'Checked
-         Width           =   855
+         Width           =   1095
       End
       Begin VB.CheckBox chkRightBracket 
          Caption         =   "]"
          Height          =   255
-         Left            =   3840
-         TabIndex        =   28
-         Top             =   240
+         Left            =   2640
+         TabIndex        =   24
+         Top             =   1680
          Value           =   1  'Checked
-         Width           =   855
+         Width           =   1095
       End
       Begin VB.CheckBox chkLeftBracket 
          Caption         =   "["
          Height          =   255
          Left            =   2640
-         TabIndex        =   27
-         Top             =   2160
+         TabIndex        =   22
+         Top             =   1200
          Value           =   1  'Checked
-         Width           =   855
+         Width           =   1095
       End
-      Begin VB.CheckBox chkRightParent 
+      Begin VB.CheckBox chkRightParenthesis 
          Caption         =   ")"
          Height          =   255
-         Left            =   2640
-         TabIndex        =   26
-         Top             =   1920
+         Left            =   240
+         TabIndex        =   8
+         Top             =   2160
          Value           =   1  'Checked
-         Width           =   855
+         Width           =   1095
       End
-      Begin VB.CheckBox chkLeftParent 
+      Begin VB.CheckBox chkLeftParenthesis 
          Caption         =   "("
          Height          =   255
-         Left            =   2640
-         TabIndex        =   25
-         Top             =   1680
+         Left            =   240
+         TabIndex        =   7
+         Top             =   1920
          Value           =   1  'Checked
-         Width           =   855
+         Width           =   1095
       End
       Begin VB.CheckBox chkPipe 
          Caption         =   "|"
          Height          =   255
-         Left            =   2640
-         TabIndex        =   24
-         Top             =   1440
+         Left            =   3840
+         TabIndex        =   29
+         Top             =   720
          Value           =   1  'Checked
-         Width           =   855
+         Width           =   1095
       End
       Begin VB.CheckBox chkComma 
-         Caption         =   ","
+         Caption         =   ", (Comma)"
          Height          =   255
-         Left            =   2640
-         TabIndex        =   23
-         Top             =   1200
+         Left            =   1440
+         TabIndex        =   11
+         Top             =   720
          Value           =   1  'Checked
-         Width           =   855
+         Width           =   1095
       End
       Begin VB.CheckBox chkPercent 
          Caption         =   "%"
          Height          =   255
-         Left            =   2640
-         TabIndex        =   22
-         Top             =   960
+         Left            =   240
+         TabIndex        =   4
+         Top             =   1200
          Value           =   1  'Checked
-         Width           =   855
+         Width           =   1095
       End
       Begin VB.CheckBox chkDollar 
          Caption         =   "$"
          Height          =   255
-         Left            =   2640
-         TabIndex        =   21
-         Top             =   720
+         Left            =   240
+         TabIndex        =   3
+         Top             =   960
          Value           =   1  'Checked
-         Width           =   855
+         Width           =   1095
       End
       Begin VB.CheckBox chkHash 
          Caption         =   "#"
          Height          =   255
-         Left            =   2640
-         TabIndex        =   20
-         Top             =   480
+         Left            =   240
+         TabIndex        =   2
+         Top             =   720
          Value           =   1  'Checked
-         Width           =   855
+         Width           =   1095
       End
       Begin VB.CheckBox chkTilde 
          Caption         =   "~"
          Height          =   255
-         Left            =   2640
-         TabIndex        =   19
-         Top             =   240
+         Left            =   3840
+         TabIndex        =   31
+         Top             =   1200
          Value           =   1  'Checked
-         Width           =   855
+         Width           =   1095
       End
       Begin VB.CheckBox chkGrave 
-         Caption         =   "`"
+         Caption         =   "` (Grave)"
          Height          =   255
-         Left            =   1440
-         TabIndex        =   18
-         Top             =   2160
+         Left            =   3840
+         TabIndex        =   27
+         Top             =   240
          Value           =   1  'Checked
-         Width           =   855
+         Width           =   1095
       End
       Begin VB.CheckBox chkPower 
          Caption         =   "^"
          Height          =   255
-         Left            =   1440
-         TabIndex        =   17
+         Left            =   2640
+         TabIndex        =   25
          Top             =   1920
          Value           =   1  'Checked
-         Width           =   855
+         Width           =   1095
       End
       Begin VB.CheckBox chkBackSlash 
          Caption         =   "\"
          Height          =   255
-         Left            =   1440
-         TabIndex        =   16
-         Top             =   1680
+         Left            =   2640
+         TabIndex        =   23
+         Top             =   1440
          Value           =   1  'Checked
-         Width           =   855
+         Width           =   1095
       End
       Begin VB.CheckBox chkAtSign 
          Caption         =   "@"
          Height          =   255
-         Left            =   1440
-         TabIndex        =   15
-         Top             =   1440
+         Left            =   2640
+         TabIndex        =   21
+         Top             =   960
          Value           =   1  'Checked
-         Width           =   855
+         Width           =   1095
       End
       Begin VB.CheckBox chkQuestion 
          Caption         =   "?"
          Height          =   255
-         Left            =   1440
-         TabIndex        =   14
-         Top             =   1200
+         Left            =   2640
+         TabIndex        =   20
+         Top             =   720
          Value           =   1  'Checked
-         Width           =   855
+         Width           =   1095
       End
       Begin VB.CheckBox chkGreaterThan 
          Caption         =   ">"
          Height          =   255
-         Left            =   1440
-         TabIndex        =   13
-         Top             =   960
+         Left            =   2640
+         TabIndex        =   19
+         Top             =   480
          Value           =   1  'Checked
-         Width           =   855
+         Width           =   1095
       End
       Begin VB.CheckBox chkEquals 
          Caption         =   "="
          Height          =   255
-         Left            =   1440
-         TabIndex        =   12
-         Top             =   720
+         Left            =   2640
+         TabIndex        =   18
+         Top             =   240
          Value           =   1  'Checked
-         Width           =   855
+         Width           =   1095
       End
       Begin VB.CheckBox chkLessThan 
          Caption         =   "<"
          Height          =   255
          Left            =   1440
-         TabIndex        =   11
-         Top             =   480
-         Value           =   1  'Checked
-         Width           =   855
-      End
-      Begin VB.CheckBox chkSemiColon 
-         Caption         =   ";"
-         Height          =   255
-         Left            =   1440
-         TabIndex        =   10
-         Top             =   240
-         Value           =   1  'Checked
-         Width           =   855
-      End
-      Begin VB.CheckBox chkColon 
-         Caption         =   ":"
-         Height          =   255
-         Left            =   240
-         TabIndex        =   9
+         TabIndex        =   17
          Top             =   2160
          Value           =   1  'Checked
-         Width           =   855
+         Width           =   1095
+      End
+      Begin VB.CheckBox chkSemiColon 
+         Caption         =   "; (Semi)"
+         Height          =   255
+         Left            =   1440
+         TabIndex        =   16
+         Top             =   1920
+         Value           =   1  'Checked
+         Width           =   1095
+      End
+      Begin VB.CheckBox chkColon 
+         Caption         =   ": (Colon)"
+         Height          =   255
+         Left            =   1440
+         TabIndex        =   15
+         Top             =   1680
+         Value           =   1  'Checked
+         Width           =   1095
       End
       Begin VB.CheckBox chkForwardSlash 
          Caption         =   "/"
          Height          =   255
-         Left            =   240
-         TabIndex        =   8
-         Top             =   1920
+         Left            =   1440
+         TabIndex        =   14
+         Top             =   1440
          Value           =   1  'Checked
-         Width           =   855
+         Width           =   1095
       End
       Begin VB.CheckBox chkPeriod 
          Caption         =   ". (Period)"
          Height          =   255
-         Left            =   240
-         TabIndex        =   7
-         ToolTipText     =   "Help: Period"
-         Top             =   1680
+         Left            =   1440
+         TabIndex        =   13
+         Top             =   1200
          Value           =   1  'Checked
-         Width           =   975
+         Width           =   1095
       End
       Begin VB.CheckBox chkMinus 
          Caption         =   "- (Minus)"
          Height          =   255
-         Left            =   240
-         TabIndex        =   6
-         ToolTipText     =   "Help: Minus"
-         Top             =   1440
+         Left            =   1440
+         TabIndex        =   12
+         Top             =   960
          Value           =   1  'Checked
-         Width           =   975
+         Width           =   1095
       End
       Begin VB.CheckBox chkPlus 
          Caption         =   "+"
          Height          =   255
-         Left            =   240
-         TabIndex        =   5
-         Top             =   1200
+         Left            =   1440
+         TabIndex        =   10
+         Top             =   480
          Value           =   1  'Checked
-         Width           =   855
+         Width           =   1095
       End
       Begin VB.CheckBox chkAsterisk 
          Caption         =   "*"
          Height          =   255
-         Left            =   240
-         TabIndex        =   4
-         Top             =   960
+         Left            =   1440
+         TabIndex        =   9
+         Top             =   240
          Value           =   1  'Checked
-         Width           =   855
+         Width           =   1095
       End
       Begin VB.CheckBox chkApostrophe 
-         Caption         =   "'"
+         Caption         =   "' (Apost.)"
          Height          =   255
          Left            =   240
-         TabIndex        =   3
-         Top             =   720
+         TabIndex        =   6
+         Top             =   1680
          Value           =   1  'Checked
-         Width           =   855
+         Width           =   1095
       End
       Begin VB.CheckBox chkAmpersand 
          Caption         =   "&&"
          Height          =   255
          Left            =   240
-         TabIndex        =   2
-         Top             =   480
+         TabIndex        =   5
+         Top             =   1440
          Value           =   1  'Checked
-         Width           =   855
+         Width           =   1095
       End
       Begin VB.CheckBox chkExclamation 
          Caption         =   "!"
          Height          =   255
          Left            =   240
-         TabIndex        =   1
+         TabIndex        =   0
          Top             =   240
          Value           =   1  'Checked
-         Width           =   855
+         Width           =   1095
       End
    End
 End
@@ -395,8 +393,8 @@ Private Sub chkLeftBracket_Click()
   frmPassGen.useLeftBracket = chkLeftBracket.Value
 End Sub
 
-Private Sub chkLeftParent_Click()
-  frmPassGen.useLeftParent = chkLeftParent.Value
+Private Sub chkLeftParenthesis_Click()
+  frmPassGen.useLeftParenthesis = chkLeftParenthesis.Value
 End Sub
 
 Private Sub chkLessThan_Click()
@@ -443,8 +441,8 @@ Private Sub chkRightBracket_Click()
   frmPassGen.useRightBracket = chkRightBracket.Value
 End Sub
 
-Private Sub chkRightParent_Click()
-  frmPassGen.useRightParent = chkRightParent.Value
+Private Sub chkRightParenthesis_Click()
+  frmPassGen.useRightParenthesis = chkRightParenthesis.Value
 End Sub
 
 Private Sub chkSemiColon_Click()
@@ -461,10 +459,17 @@ End Sub
 
 Private Sub cmdIncludeAll_Click()
   chkExclamation.Value = 1
+  chkQuote.Value = 1
+  chkHash.Value = 1
+  chkDollar.Value = 1
+  chkPercent.Value = 1
   chkAmpersand.Value = 1
   chkApostrophe.Value = 1
+  chkLeftParenthesis.Value = 1
+  chkRightParenthesis.Value = 1
   chkAsterisk.Value = 1
   chkPlus.Value = 1
+  chkComma.Value = 1
   chkMinus.Value = 1
   chkPeriod.Value = 1
   chkForwardSlash.Value = 1
@@ -475,23 +480,17 @@ Private Sub cmdIncludeAll_Click()
   chkGreaterThan.Value = 1
   chkQuestion.Value = 1
   chkAtSign.Value = 1
-  chkBackSlash.Value = 1
-  chkPower.Value = 1
-  chkGrave.Value = 1
-  chkTilde.Value = 1
-  chkHash.Value = 1
-  chkDollar.Value = 1
-  chkPercent.Value = 1
-  chkComma.Value = 1
-  chkPipe.Value = 1
-  chkLeftParent.Value = 1
-  chkRightParent.Value = 1
   chkLeftBracket.Value = 1
+  chkBackSlash.Value = 1
   chkRightBracket.Value = 1
-  chkLeftBrace.Value = 1
-  chkRightBrace.Value = 1
-  chkQuote.Value = 1
+  chkPower.Value = 1
   chkUnderscore.Value = 1
+  chkGrave.Value = 1
+  chkLeftBrace.Value = 1
+  chkPipe.Value = 1
+  chkRightBrace.Value = 1
+  chkTilde.Value = 1
+  ' `-> ASCII table order.
 End Sub
 
 Private Sub cmdOkay_Click()
@@ -500,10 +499,17 @@ End Sub
 
 Private Sub Form_Load()
   chkExclamation.Value = IIf(frmPassGen.useExclamation = 1, 1, 0)
+  chkQuote.Value = IIf(frmPassGen.useQuote = 1, 1, 0)
+  chkHash.Value = IIf(frmPassGen.useHash = 1, 1, 0)
+  chkDollar.Value = IIf(frmPassGen.useDollar = 1, 1, 0)
+  chkPercent.Value = IIf(frmPassGen.usePercent = 1, 1, 0)
   chkAmpersand.Value = IIf(frmPassGen.useAmpersand = 1, 1, 0)
   chkApostrophe.Value = IIf(frmPassGen.useApostrophe = 1, 1, 0)
+  chkLeftParenthesis.Value = IIf(frmPassGen.useLeftParenthesis = 1, 1, 0)
+  chkRightParenthesis.Value = IIf(frmPassGen.useRightParenthesis = 1, 1, 0)
   chkAsterisk.Value = IIf(frmPassGen.useAsterisk = 1, 1, 0)
   chkPlus.Value = IIf(frmPassGen.usePlus = 1, 1, 0)
+  chkComma.Value = IIf(frmPassGen.useComma = 1, 1, 0)
   chkMinus.Value = IIf(frmPassGen.useMinus = 1, 1, 0)
   chkPeriod.Value = IIf(frmPassGen.usePeriod = 1, 1, 0)
   chkForwardSlash.Value = IIf(frmPassGen.useForwardSlash = 1, 1, 0)
@@ -514,23 +520,17 @@ Private Sub Form_Load()
   chkGreaterThan.Value = IIf(frmPassGen.useGreaterThan = 1, 1, 0)
   chkQuestion.Value = IIf(frmPassGen.useQuestion = 1, 1, 0)
   chkAtSign.Value = IIf(frmPassGen.useAtSign = 1, 1, 0)
-  chkBackSlash.Value = IIf(frmPassGen.useBackSlash = 1, 1, 0)
-  chkPower.Value = IIf(frmPassGen.usePower = 1, 1, 0)
-  chkGrave.Value = IIf(frmPassGen.useGrave = 1, 1, 0)
-  chkTilde.Value = IIf(frmPassGen.useTilde = 1, 1, 0)
-  chkHash.Value = IIf(frmPassGen.useHash = 1, 1, 0)
-  chkDollar.Value = IIf(frmPassGen.useDollar = 1, 1, 0)
-  chkPercent.Value = IIf(frmPassGen.usePercent = 1, 1, 0)
-  chkComma.Value = IIf(frmPassGen.useComma = 1, 1, 0)
-  chkPipe.Value = IIf(frmPassGen.usePipe = 1, 1, 0)
-  chkLeftParent.Value = IIf(frmPassGen.useLeftParent = 1, 1, 0)
-  chkRightParent.Value = IIf(frmPassGen.useRightParent = 1, 1, 0)
   chkLeftBracket.Value = IIf(frmPassGen.useLeftBracket = 1, 1, 0)
+  chkBackSlash.Value = IIf(frmPassGen.useBackSlash = 1, 1, 0)
   chkRightBracket.Value = IIf(frmPassGen.useRightBracket = 1, 1, 0)
-  chkLeftBrace.Value = IIf(frmPassGen.useLeftBrace = 1, 1, 0)
-  chkRightBrace.Value = IIf(frmPassGen.useRightBrace = 1, 1, 0)
-  chkQuote.Value = IIf(frmPassGen.useQuote = 1, 1, 0)
+  chkPower.Value = IIf(frmPassGen.usePower = 1, 1, 0)
   chkUnderscore.Value = IIf(frmPassGen.useUnderscore = 1, 1, 0)
+  chkGrave.Value = IIf(frmPassGen.useGrave = 1, 1, 0)
+  chkLeftBrace.Value = IIf(frmPassGen.useLeftBrace = 1, 1, 0)
+  chkPipe.Value = IIf(frmPassGen.usePipe = 1, 1, 0)
+  chkRightBrace.Value = IIf(frmPassGen.useRightBrace = 1, 1, 0)
+  chkTilde.Value = IIf(frmPassGen.useTilde = 1, 1, 0)
+  ' `-> ASCII table order.
 End Sub
 
 Private Sub Form_Terminate()
