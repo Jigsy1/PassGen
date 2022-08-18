@@ -65,7 +65,7 @@ Begin VB.Form frmPassGen
          Height          =   315
          ItemData        =   "frmPassGen.frx":0000
          Left            =   2760
-         List            =   "frmPassGen.frx":0013
+         List            =   "frmPassGen.frx":0019
          Style           =   2  'Dropdown List
          TabIndex        =   10
          Top             =   1240
@@ -292,9 +292,7 @@ Private Function makePass(passCount As Integer, inputLength As Variant)
   ' `-> Chr(32) is <SPACE>
   Dim isRand As Integer
   isRand = 0
-  If inputLength = "Rand" Then
-    isRand = 1
-  End If
+  If inputLength = "Rand" Then isRand = 1
   lstPasswords.Clear
   Dim makeNumber As Integer, outString As String, randNumber As Integer
   For makeNumber = 0 To passCount - 1
@@ -303,7 +301,7 @@ Private Function makePass(passCount As Integer, inputLength As Variant)
     If isRand = 1 Then inputLength = Int(Val(minPassLen + Val(Rnd * Val(maxPassLen - Val(minPassLen - 1)))))
     For lengthNumber = 0 To inputLength - 1
       If moreRandomness = 1 Then
-        randNumber = Int(Val(1 + Val(Rnd * 4)))
+        randNumber = Int(Val(1 + Val(Rnd * 6)))
         Select Case randNumber
           Case 1
             outString = outString & Mid(baseString, Int(Val(1 + Val(Rnd * Len(baseString)))), 1)
@@ -315,6 +313,12 @@ Private Function makePass(passCount As Integer, inputLength As Variant)
           Case 4
             ' ,-> Latter half
             outString = outString & Mid(Mid(baseString, Val(Len(baseString) / 2)), Int(Val(1 + Val(Rnd * Len(Mid(baseString, Val(Len(baseString) / 2)))))), 1)
+          Case 5
+            ' ,-> Former half (Reverse)
+            outString = outString & Mid(Mid(StrReverse(baseString), 1, Val(Len(StrReverse(baseString)) / 2)), Int(Val(1 + Val(Rnd * Len(Mid(StrReverse(baseString), 1, Val(Len(StrReverse(baseString)) / 2)))))), 1)
+          Case 6
+            ' ,-> Latter half (Reverse)
+            outString = outString & Mid(Mid(StrReverse(baseString), Val(Len(StrReverse(baseString)) / 2)), Int(Val(1 + Val(Rnd * Len(Mid(StrReverse(baseString), Val(Len(StrReverse(baseString)) / 2)))))), 1)
         End Select
       Else
         outString = outString & Mid(baseString, Int(Val(1 + Val(Rnd * Len(baseString)))), 1)
@@ -326,9 +330,7 @@ Private Function makePass(passCount As Integer, inputLength As Variant)
         If Len(outString) >= 20 Then
           outString = outString & " ---------- " & Int(Val(1 + Val(Rnd * cmbPIM.Text)))
         Else
-          If cmbPIM.Text > defaultPIM Then
-            outString = outString & " ---------- " & Int(Val(defaultPIM + Val(Rnd * Val(cmbPIM.Text - Val(defaultPIM - 1)))))
-          End If
+          If cmbPIM.Text > defaultPIM Then outString = outString & " ---------- " & Int(Val(defaultPIM + Val(Rnd * Val(cmbPIM.Text - Val(defaultPIM - 1)))))
         End If
       End If
     End If
