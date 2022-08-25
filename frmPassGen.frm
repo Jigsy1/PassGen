@@ -162,7 +162,7 @@ Begin VB.Form frmPassGen
          Width           =   3135
       End
       Begin VB.CheckBox chkNumChars 
-         Caption         =   "Include Numbers"
+         Caption         =   "Include Numbers (0-9)"
          Height          =   255
          Left            =   120
          TabIndex        =   2
@@ -171,7 +171,7 @@ Begin VB.Form frmPassGen
          Width           =   3615
       End
       Begin VB.CheckBox chkUpperChars 
-         Caption         =   "Include Uppercase characters"
+         Caption         =   "Include Uppercase characters (A-Z)"
          Height          =   255
          Left            =   120
          TabIndex        =   0
@@ -180,7 +180,7 @@ Begin VB.Form frmPassGen
          Width           =   3615
       End
       Begin VB.CheckBox chkLowerChars 
-         Caption         =   "Include Lowercase characters"
+         Caption         =   "Include Lowercase characters (a-z)"
          Height          =   255
          Left            =   120
          TabIndex        =   1
@@ -254,6 +254,7 @@ Public defaultPIM As Integer
 Public maxPassLen As Integer
 Public minPassLen As Integer
 Public moreRandomness As Integer
+Public specialsNeeded As Integer
 
 ' ,-> Code:
 
@@ -374,7 +375,7 @@ Public Function makeSpecialString() As String
   If useTilde = 1 Then baseString = baseString & "~"
   ' `-> ASCII table order.
   specialString = baseString
-  If IsNull(baseString) = True Or baseString = "" Then
+  If IsNull(baseString) = True Or baseString = "" Or Len(baseString) < specialsNeeded Then
     chkSpecialChars.Value = 0
   Else
     chkSpecialChars.Value = 1
@@ -390,8 +391,8 @@ Private Sub chkAutomatic_Click()
 End Sub
 
 Private Sub chkSpecialChars_Click()
-  If IsNull(specialString) = True Or specialString = "" And chkSpecialChars.Value = 1 Then
-    MsgBox "Cannot enable. You have no special character(s) chosen.", vbExclamation, "Error"
+  If IsNull(specialString) = True Or specialString = "" Or Len(specialString) < specialsNeeded Then
+    If chkSpecialChars.Value = 1 Then MsgBox "Cannot enable. You either have no special character(s) chosen, or less than " & specialsNeeded & " enabled.", vbExclamation, "Error"
     chkSpecialChars.Value = 0
   End If
 End Sub
@@ -490,6 +491,8 @@ Private Sub Form_Load()
   minPassLen = 8
   ' `-> WARNING!: DO NOT CHANGE THIS!
   moreRandomness = 0
+  specialsNeeded = 2
+  ' `-> Default number of special character(s) required.
   Call makeSpecialString
   Dim countNumber As Integer
   For countNumber = 1 To 1024
