@@ -6,6 +6,7 @@ Begin VB.Form frmOverride
    ClientLeft      =   45
    ClientTop       =   330
    ClientWidth     =   3585
+   KeyPreview      =   -1  'True
    LinkTopic       =   "Form1"
    MaxButton       =   0   'False
    ScaleHeight     =   2025
@@ -108,6 +109,10 @@ Private Sub cmdOkay_Click()
     frmPassGen.maxPassLen = frmPassGen.defaultMaxPassLen
   End If
   Unload Me
+End Sub
+
+Private Sub Form_KeyPress(KeyAscii As Integer)
+  If KeyAscii = vbKeyEscape Then Unload Me
 End Sub
 
 Private Sub Form_Load()
