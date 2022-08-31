@@ -555,7 +555,9 @@ Private Sub cmdSpecial_Click()
 End Sub
 
 Private Sub Form_KeyDown(KeyCode As Integer, Shift As Integer)
-  If KeyCode = vbKeyF5 Then Call makePass(cmbNumber.Text, cmbLength.Text)
+  If KeyCode = vbKeyF5 Then
+    If chkUpperChars.Value <> 0 Or chkLowerChars.Value <> 0 Or chkNumChars.Value <> 0 Or chkSpecialChars.Value <> 0 Then Call makePass(cmbNumber.Text, cmbLength.Text)
+  End If
   If KeyCode = vbKeyDelete Then lstPasswords.Clear
 End Sub
 
