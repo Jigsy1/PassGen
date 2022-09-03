@@ -2,83 +2,91 @@ VERSION 5.00
 Begin VB.Form frmPassGen 
    BorderStyle     =   1  'Fixed Single
    Caption         =   "Password Generator"
-   ClientHeight    =   3960
+   ClientHeight    =   4200
    ClientLeft      =   45
    ClientTop       =   615
    ClientWidth     =   12000
    KeyPreview      =   -1  'True
    LinkTopic       =   "Form1"
    MaxButton       =   0   'False
-   ScaleHeight     =   3960
+   ScaleHeight     =   4200
    ScaleWidth      =   12000
    StartUpPosition =   2  'CenterScreen
    Begin VB.CommandButton cmdSelect 
       Caption         =   "&Select All"
       Height          =   375
       Left            =   2040
-      TabIndex        =   12
-      Top             =   3480
+      TabIndex        =   13
+      Top             =   3720
       Width           =   1335
    End
    Begin VB.Timer tmrAutomatic 
       Enabled         =   0   'False
       Interval        =   60000
       Left            =   9960
-      Top             =   3480
+      Top             =   3720
    End
    Begin VB.Timer tmrNoteClear 
       Enabled         =   0   'False
       Interval        =   2000
       Left            =   9480
-      Top             =   3480
+      Top             =   3720
    End
    Begin VB.CommandButton cmdClose 
       Caption         =   "&Close"
       Height          =   375
       Left            =   10560
-      TabIndex        =   15
-      Top             =   3480
+      TabIndex        =   16
+      Top             =   3720
       Width           =   1335
    End
    Begin VB.CommandButton cmdCopy 
       Caption         =   "C&opy"
       Height          =   375
       Left            =   3480
-      TabIndex        =   13
-      Top             =   3480
+      TabIndex        =   14
+      Top             =   3720
       Width           =   1335
    End
    Begin VB.CommandButton cmdGenerate 
       Caption         =   "&Generate"
       Height          =   375
       Left            =   120
-      TabIndex        =   11
-      Top             =   3480
+      TabIndex        =   12
+      Top             =   3720
       Width           =   1335
    End
    Begin VB.Frame fmeString 
-      Height          =   1695
+      Height          =   1935
       Left            =   120
-      TabIndex        =   17
+      TabIndex        =   18
       Top             =   1680
       Width           =   3855
+      Begin VB.CheckBox chkNoRep 
+         Caption         =   "Avoid using the same character in succession"
+         Height          =   255
+         Left            =   120
+         TabIndex        =   9
+         Top             =   1240
+         Width           =   3615
+      End
       Begin VB.ComboBox cmbPIM 
          Height          =   315
          ItemData        =   "frmPassGen.frx":0000
          Left            =   2760
          List            =   "frmPassGen.frx":0019
          Style           =   2  'Dropdown List
-         TabIndex        =   10
-         Top             =   1240
+         TabIndex        =   11
+         Top             =   1520
          Width           =   975
       End
       Begin VB.CheckBox chkPIM 
          Caption         =   "Include a random PIM from 1 to "
          Height          =   255
          Left            =   120
-         TabIndex        =   9
+         TabIndex        =   10
          ToolTipText     =   "Note: For when making VeraCrypt file(s)/volume(s)"
-         Top             =   1290
+         Top             =   1560
          Width           =   3615
       End
       Begin VB.CheckBox chkAutomatic 
@@ -109,7 +117,7 @@ Begin VB.Form frmPassGen
          Caption         =   "That are a length of                              characters"
          Height          =   255
          Left            =   120
-         TabIndex        =   19
+         TabIndex        =   20
          Top             =   640
          Width           =   3615
       End
@@ -117,16 +125,16 @@ Begin VB.Form frmPassGen
          Caption         =   "Generate a total of                                password(s)"
          Height          =   255
          Left            =   120
-         TabIndex        =   18
+         TabIndex        =   19
          Top             =   280
          Width           =   3615
       End
    End
    Begin VB.ListBox lstPasswords 
-      Height          =   3180
+      Height          =   3375
       Left            =   4080
       MultiSelect     =   2  'Extended
-      TabIndex        =   14
+      TabIndex        =   15
       Top             =   120
       Width           =   7815
    End
@@ -134,7 +142,7 @@ Begin VB.Form frmPassGen
       Caption         =   "Include:"
       Height          =   1575
       Left            =   120
-      TabIndex        =   16
+      TabIndex        =   17
       Top             =   120
       Width           =   3855
       Begin VB.CommandButton cmdSpecial 
@@ -211,7 +219,7 @@ Begin VB.Form frmPassGen
          Caption         =   "-"
       End
       Begin VB.Menu menuSave 
-         Caption         =   "&Save Settings to Registry on Exit"
+         Caption         =   "&Save Settings to Registry on Exit for Next Time"
       End
    End
    Begin VB.Menu menuAbout 
@@ -317,7 +325,7 @@ Private Function makePass(passCount As Integer, inputLength As Variant)
   isRand = 0
   If inputLength = "Rand" Then isRand = 1
   lstPasswords.Clear
-  Dim makeNumber As Integer, outString As String, randNumber As Integer
+  Dim makeNumber As Integer, lastChar As String, newChar As String, outString As String, randNumber As Integer
   For makeNumber = 0 To passCount - 1
     outString = ""
     Dim lengthNumber As Integer
@@ -327,25 +335,41 @@ Private Function makePass(passCount As Integer, inputLength As Variant)
         randNumber = Int(Val(1 + Val(Rnd * 6)))
         Select Case randNumber
           Case 1
-            outString = outString & Mid(baseString, Int(Val(1 + Val(Rnd * Len(baseString)))), 1)
+            newChar = Mid(baseString, Int(Val(1 + Val(Rnd * Len(baseString)))), 1)
           Case 2
-            outString = outString & Mid(StrReverse(baseString), Int(Val(1 + Val(Rnd * Len(StrReverse(baseString))))), 1)
+            newChar = Mid(StrReverse(baseString), Int(Val(1 + Val(Rnd * Len(StrReverse(baseString))))), 1)
           Case 3
             ' ,-> Former half
-            outString = outString & Mid(Mid(baseString, 1, Val(Len(baseString) / 2)), Int(Val(1 + Val(Rnd * Len(Mid(baseString, 1, Val(Len(baseString) / 2)))))), 1)
+            newChar = Mid(Mid(baseString, 1, Val(Len(baseString) / 2)), Int(Val(1 + Val(Rnd * Len(Mid(baseString, 1, Val(Len(baseString) / 2)))))), 1)
           Case 4
             ' ,-> Latter half
-            outString = outString & Mid(Mid(baseString, Val(Len(baseString) / 2)), Int(Val(1 + Val(Rnd * Len(Mid(baseString, Val(Len(baseString) / 2)))))), 1)
+            newChar = Mid(Mid(baseString, Val(Len(baseString) / 2)), Int(Val(1 + Val(Rnd * Len(Mid(baseString, Val(Len(baseString) / 2)))))), 1)
           Case 5
             ' ,-> Former half (Reverse)
-            outString = outString & Mid(Mid(StrReverse(baseString), 1, Val(Len(StrReverse(baseString)) / 2)), Int(Val(1 + Val(Rnd * Len(Mid(StrReverse(baseString), 1, Val(Len(StrReverse(baseString)) / 2)))))), 1)
+            newChar = Mid(Mid(StrReverse(baseString), 1, Val(Len(StrReverse(baseString)) / 2)), Int(Val(1 + Val(Rnd * Len(Mid(StrReverse(baseString), 1, Val(Len(StrReverse(baseString)) / 2)))))), 1)
           Case 6
             ' ,-> Latter half (Reverse)
-            outString = outString & Mid(Mid(StrReverse(baseString), Val(Len(StrReverse(baseString)) / 2)), Int(Val(1 + Val(Rnd * Len(Mid(StrReverse(baseString), Val(Len(StrReverse(baseString)) / 2)))))), 1)
+            newChar = Mid(Mid(StrReverse(baseString), Val(Len(StrReverse(baseString)) / 2)), Int(Val(1 + Val(Rnd * Len(Mid(StrReverse(baseString), Val(Len(StrReverse(baseString)) / 2)))))), 1)
         End Select
       Else
-        outString = outString & Mid(baseString, Int(Val(1 + Val(Rnd * Len(baseString)))), 1)
+        newChar = Mid(baseString, Int(Val(1 + Val(Rnd * Len(baseString)))), 1)
       End If
+    If chkNoRep.Value = 1 Then
+      If lastChar <> "" Then
+        If lastChar = newChar Then
+          ' `-> Do it again.
+          lengthNumber = lengthNumber - 1
+        Else
+          outString = outString & newChar
+          lastChar = newChar
+        End If
+      Else
+        outString = outString & newChar
+        lastChar = newChar
+      End If
+    Else
+      outString = outString & newChar
+    End If
     Next lengthNumber
     If chkPIM.Value = 1 Then
       If Len(outString) <= 64 Then
@@ -446,6 +470,7 @@ Public Function saveToRegistry()
     qS.regWrite ourPath & "passCount", cmbNumber.Text, "REG_DWORD"
     qS.regWrite ourPath & "passLength", cmbLength.Text, "REG_SZ"
     qS.regWrite ourPath & "useAutomatic", chkAutomatic.Value, "REG_DWORD"
+    qS.regWrite ourPath & "useNoRepeat", chkNoRep.Value, "REG_DWORD"
     qS.regWrite ourPath & "usePIM", chkPIM.Value, "REG_DWORD"
     qS.regWrite ourPath & "PIM", cmbPIM.Text, "REG_DWORD"
     ' ,-> Special(s).
@@ -707,6 +732,7 @@ Private Sub Form_Load()
       End If
     End If
     If isRegKey(ourPath & "useAutomatic") = True Then chkAutomatic.Value = isBool(qS.regRead(ourPath & "useAutomatic"))
+    If isRegKey(ourPath & "useNoRepeat") = True Then chkNoRep.Value = isBool(qS.regRead(ourPath & "useNoRepeat"))
     If isRegKey(ourPath & "usePIM") = True Then chkPIM.Value = isBool(qS.regRead(ourPath & "usePIM"))
     If isRegKey(ourPath & "PIM") = True Then
       If IsNumeric(qS.regRead(ourPath & "PIM")) = True Then
