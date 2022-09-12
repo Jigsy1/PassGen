@@ -275,11 +275,14 @@ Public useTilde As Integer
 ' `-> ASCII table order.
 
 Public defaultMaxPassLen As Integer
+Public defaultPassLenPIM As Integer
 Public defaultPIM As Integer
 Public maxPassCount As Integer
 Public maxPassLen As Integer
 Public minPassLen As Integer
 Public moreRandomness As Integer
+Public overridePIM As Integer
+Public passLenPIM As Integer
 Public specialsNeeded As Integer
 
 Public ourPath As String
@@ -372,12 +375,12 @@ Private Function makePass(passCount As Integer, inputLength As Variant)
     End If
     Next lengthNumber
     If chkPIM.Value = 1 Then
-      If Len(outString) <= 64 Then
-        ' `-> VeraCrypt length is limited to 64 characters. There is no point to including a PIM if it's longer than that.
+      If Len(outString) <= passLenPIM Then
+        ' `-> VeraCrypt length is limited to a certain number of characters. There is no point to including a PIM if it's longer than that.
         If Len(outString) >= 20 Then
           outString = outString & " ---------- " & Int(Val(1 + Val(Rnd * cmbPIM.Text)))
         Else
-          If cmbPIM.Text > defaultPIM Then outString = outString & " ---------- " & Int(Val(defaultPIM + Val(Rnd * Val(cmbPIM.Text - Val(defaultPIM - 1)))))
+          If cmbPIM.Text > overridePIM Then outString = outString & " ---------- " & Int(Val(overridePIM + Val(Rnd * Val(cmbPIM.Text - Val(overridePIM - 1)))))
         End If
       End If
     End If
@@ -511,6 +514,8 @@ Public Function saveToRegistry()
     qS.regWrite ourPath & "override256", IIf(maxPassLen = 256, 1, 0), "REG_DWORD"
     qS.regWrite ourPath & "override512", IIf(maxPassLen = 512, 1, 0), "REG_DWORD"
     qS.regWrite ourPath & "moreRandomness", moreRandomness, "REG_DWORD"
+    qS.regWrite ourPath & "limitPIM", IIf(passLenPIM = 64, 1, 0), "REG_DWORD"
+    qS.regWrite ourPath & "dropPIM", IIf(overridePIM = 92, 1, 0), "REG_DWORD"
   End If
 End Function
 
@@ -635,8 +640,12 @@ Private Sub Form_Load()
   defaultPIM = 485
   ' `-> For use when making VeraCrypt file(s)/volume(s).
   '     The default is actually 98 if you use sha512 or Whirlpool, but since I have no way of telling that, I'll use the 2nd default.
+  overridePIM = defaultPIM
+  defaultPassLenPIM = 128
+  ' `-> Password length limit to use with PIM.
+  passLenPIM = defaultPassLenPIM
   maxPassCount = 1024
-  maxPassLen = 64
+  maxPassLen = defaultMaxPassLen
   minPassLen = 8
   ' `-> WARNING!: DO NOT CHANGE THIS! NOBODY SHOULD BE USING PASSWORDS LESS THAN EIGHT CHARACTERS ANYMORE!
   moreRandomness = 0
@@ -714,6 +723,12 @@ Private Sub Form_Load()
     ' `-> If on the off chance someone modifies the registry to include all three, it'll just default to 128. (Or 256?)
     If maxPassLen <> defaultMaxPassLen Then Call addLenNumbers
     If isRegKey(ourPath & "moreRandomness") = True Then moreRandomness = isBool(qS.regRead(ourPath & "moreRandomness"))
+    If isRegKey(ourPath & "limitPIM") = True Then
+      If isBool(qS.regRead(ourPath & "limitPIM")) = 1 Then passLenPIM = 64
+    End If
+    If isRegKey(ourPath & "dropPIM") = True Then
+      If isBool(qS.regRead(ourPath & "dropPIM")) = 1 Then overridePIM = 92
+    End If
     ' ,-> Lastly...
     If isRegKey(ourPath & "passCount") = True Then
       If IsNumeric(qS.regRead(ourPath & "passCount")) = True Then
