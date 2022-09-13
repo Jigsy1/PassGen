@@ -5,17 +5,17 @@ Begin VB.Form frmOverride
    ClientHeight    =   2505
    ClientLeft      =   45
    ClientTop       =   330
-   ClientWidth     =   4560
+   ClientWidth     =   4680
    KeyPreview      =   -1  'True
    LinkTopic       =   "Form1"
    MaxButton       =   0   'False
    ScaleHeight     =   2505
-   ScaleWidth      =   4560
+   ScaleWidth      =   4680
    StartUpPosition =   1  'CenterOwner
    Begin VB.CommandButton cmdOkay 
       Caption         =   "&OK"
       Height          =   375
-      Left            =   3120
+      Left            =   3240
       TabIndex        =   6
       Top             =   2040
       Width           =   1335
@@ -26,15 +26,15 @@ Begin VB.Form frmOverride
       Left            =   120
       TabIndex        =   7
       Top             =   120
-      Width           =   4335
+      Width           =   4455
       Begin VB.CheckBox chkDropPIM 
-         Caption         =   "Drop default PIM to 92 (sha512/Whirlpool usage)"
+         Caption         =   "Drop default PIM to 92 (sha512/Whirlpool usage only)"
          Height          =   315
          Left            =   120
          TabIndex        =   5
-         ToolTipText     =   "Note: For those who use sha512/Whirlpool in VeraCrypt"
+         ToolTipText     =   "Note: For VeraCrypt with sha512/Whirlpool usage only"
          Top             =   1440
-         Width           =   4095
+         Width           =   4215
       End
       Begin VB.CheckBox chkLimitPIM 
          Caption         =   "Limit PIM usage to passwords that are 64 characters"
@@ -42,7 +42,7 @@ Begin VB.Form frmOverride
          Left            =   120
          TabIndex        =   4
          Top             =   1200
-         Width           =   4095
+         Width           =   4215
       End
       Begin VB.CheckBox chkRandom 
          Caption         =   "Make generation slightly more random"
@@ -51,7 +51,7 @@ Begin VB.Form frmOverride
          TabIndex        =   3
          ToolTipText     =   "Note: This could be a good thing or bad thing depending on randomness"
          Top             =   960
-         Width           =   4095
+         Width           =   4215
       End
       Begin VB.CheckBox chk512 
          Caption         =   "Allow passwords up to 512 character(s)"
@@ -59,7 +59,7 @@ Begin VB.Form frmOverride
          Left            =   120
          TabIndex        =   2
          Top             =   720
-         Width           =   4095
+         Width           =   4215
       End
       Begin VB.CheckBox chk256 
          Caption         =   "Allow passwords up to 256 character(s)"
@@ -67,7 +67,7 @@ Begin VB.Form frmOverride
          Left            =   120
          TabIndex        =   1
          Top             =   480
-         Width           =   4095
+         Width           =   4215
       End
       Begin VB.CheckBox chk128 
          Caption         =   "Allow passwords up to 128 character(s)"
@@ -75,7 +75,7 @@ Begin VB.Form frmOverride
          Left            =   120
          TabIndex        =   0
          Top             =   240
-         Width           =   4095
+         Width           =   4215
       End
    End
 End
@@ -84,12 +84,6 @@ Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = True
 Attribute VB_Exposed = False
-Private Function resetSettings()
-  If chk128.Value = 0 And chk256.Value = 0 And chk512.Value = 0 And frmPassGen.maxPassLen <> frmPassGen.defaultMaxPassLen Then frmPassGen.maxPassLen = frmPassGen.defaultMaxPassLen
-  If chkLimitPIM.Value = 0 And frmPassGen.passLenPIM <> frmPassGen.defaultPassLenPIM Then frmPassGen.passLenPIM = frmPassGen.defaultPassLenPIM
-  If chkDropPIM.Value = 0 And frmPassGen.overridePIM <> frmPassGen.defaultPIM Then frmPassGen.overridePIM = frmPassGen.defaultPIM
-End Function
-
 Private Sub chk128_Click()
   If chk256.Value = 0 And chk512.Value = 0 Then
     frmPassGen.maxPassLen = 128
@@ -118,11 +112,19 @@ Private Sub chk512_Click()
 End Sub
 
 Private Sub chkDropPIM_Click()
-  frmPassGen.overridePIM = 92
+  If chkDropPIM.Value = 1 Then
+    frmPassGen.overridePIM = 92
+  Else
+    frmPassGen.overridePIM = frmPassGen.defaultPIM
+  End If
 End Sub
 
 Private Sub chkLimitPIM_Click()
-  frmPassGen.passLenPIM = 64
+  If chkLimitPIM.Value = 1 Then
+    frmPassGen.passLenPIM = 64
+  Else
+    frmPassGen.passLenPIM = frmPassGen.defaultPassLenPIM
+  End If
 End Sub
 
 Private Sub chkRandom_Click()
@@ -130,15 +132,11 @@ Private Sub chkRandom_Click()
 End Sub
 
 Private Sub cmdOkay_Click()
-  Call resetSettings
   Unload Me
 End Sub
 
 Private Sub Form_KeyPress(KeyAscii As Integer)
-  If KeyAscii = vbKeyEscape Then
-    Call resetSettings
-    Unload Me
-  End If
+  If KeyAscii = vbKeyEscape Then Unload Me
 End Sub
 
 Private Sub Form_Load()
@@ -156,6 +154,7 @@ Private Sub Form_Terminate()
 End Sub
 
 Private Sub Form_Unload(Cancel As Integer)
+  If chk128.Value = 0 And chk256.Value = 0 And chk512.Value = 0 And frmPassGen.maxPassLen <> frmPassGen.defaultMaxPassLen Then frmPassGen.maxPassLen = frmPassGen.defaultMaxPassLen
   Call frmPassGen.addLenNumbers
 End Sub
 

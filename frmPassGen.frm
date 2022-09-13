@@ -13,7 +13,7 @@ Begin VB.Form frmPassGen
    ScaleWidth      =   12000
    StartUpPosition =   2  'CenterScreen
    Begin VB.CommandButton cmdSelect 
-      Caption         =   "&Select All"
+      Caption         =   "Se&lect All"
       Height          =   375
       Left            =   2040
       TabIndex        =   13
@@ -49,7 +49,7 @@ Begin VB.Form frmPassGen
       Width           =   1335
    End
    Begin VB.CommandButton cmdGenerate 
-      Caption         =   "&Generate"
+      Caption         =   "&Generate (F5)"
       Height          =   375
       Left            =   120
       TabIndex        =   12
@@ -57,6 +57,7 @@ Begin VB.Form frmPassGen
       Width           =   1335
    End
    Begin VB.Frame fmeString 
+      Caption         =   "Extra:"
       Height          =   1935
       Left            =   120
       TabIndex        =   18
@@ -131,11 +132,11 @@ Begin VB.Form frmPassGen
       End
    End
    Begin VB.ListBox lstPasswords 
-      Height          =   3375
+      Height          =   3570
       Left            =   4080
       MultiSelect     =   2  'Extended
       TabIndex        =   15
-      Top             =   120
+      Top             =   0
       Width           =   7815
    End
    Begin VB.Frame fmeSettings 
@@ -143,7 +144,7 @@ Begin VB.Form frmPassGen
       Height          =   1575
       Left            =   120
       TabIndex        =   17
-      Top             =   120
+      Top             =   0
       Width           =   3855
       Begin VB.CommandButton cmdSpecial 
          Caption         =   "?"
@@ -154,25 +155,25 @@ Begin VB.Form frmPassGen
          Width           =   255
       End
       Begin VB.CheckBox chkSpaces 
-         Caption         =   "Include Spaces"
-         Height          =   255
+         Caption         =   "Space"
+         Height          =   195
          Left            =   120
          TabIndex        =   5
          Top             =   1200
          Width           =   3615
       End
       Begin VB.CheckBox chkSpecialChars 
-         Caption         =   "Include Special characters (!, "", #, etc.)"
-         Height          =   255
+         Caption         =   "Special characters (!, "", #, $, etc.)"
+         Height          =   195
          Left            =   120
          TabIndex        =   3
          Top             =   960
          Value           =   1  'Checked
-         Width           =   3135
+         Width           =   3015
       End
       Begin VB.CheckBox chkNumChars 
-         Caption         =   "Include Numbers (0-9)"
-         Height          =   255
+         Caption         =   "Numbers (0...9)"
+         Height          =   195
          Left            =   120
          TabIndex        =   2
          Top             =   720
@@ -180,8 +181,8 @@ Begin VB.Form frmPassGen
          Width           =   3615
       End
       Begin VB.CheckBox chkUpperChars 
-         Caption         =   "Include Uppercase characters (A-Z)"
-         Height          =   255
+         Caption         =   "Uppercase characters (A...Z)"
+         Height          =   195
          Left            =   120
          TabIndex        =   0
          Top             =   240
@@ -189,8 +190,8 @@ Begin VB.Form frmPassGen
          Width           =   3615
       End
       Begin VB.CheckBox chkLowerChars 
-         Caption         =   "Include Lowercase characters (a-z)"
-         Height          =   255
+         Caption         =   "Lowercase characters (a...z)"
+         Height          =   195
          Left            =   120
          TabIndex        =   1
          Top             =   480
@@ -208,11 +209,11 @@ Begin VB.Form frmPassGen
    Begin VB.Menu menuSettings 
       Caption         =   "&Settings"
       Begin VB.Menu menuSpecial 
-         Caption         =   "&Include Special characters"
+         Caption         =   "&Include Special Characters"
          Shortcut        =   ^I
       End
       Begin VB.Menu menuOverride 
-         Caption         =   "&Override settings"
+         Caption         =   "&Override Settings"
          Shortcut        =   ^O
       End
       Begin VB.Menu menuSeparatorA 
@@ -225,7 +226,15 @@ Begin VB.Form frmPassGen
    Begin VB.Menu menuAbout 
       Caption         =   "&About"
       Begin VB.Menu menuAboutForm 
-         Caption         =   "&About"
+         Caption         =   "&License"
+         Shortcut        =   ^L
+      End
+      Begin VB.Menu menuSeparatorB 
+         Caption         =   "-"
+      End
+      Begin VB.Menu menuWebsite 
+         Caption         =   "&Website..."
+         Shortcut        =   ^W
       End
    End
 End
@@ -314,7 +323,7 @@ Public Function addLenNumbers()
 End Function
 
 Private Function makePass(passCount As Integer, inputLength As Variant)
-  Randomize
+  Randomize Timer
   Dim baseString As String
   If chkUpperChars.Value = 1 Then baseString = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
   If chkLowerChars.Value = 1 Then baseString = baseString & "abcdefghijklmnopqrstuvwxyz"
@@ -328,7 +337,7 @@ Private Function makePass(passCount As Integer, inputLength As Variant)
   isRand = 0
   If inputLength = "Rand" Then isRand = 1
   lstPasswords.Clear
-  Dim makeNumber As Integer, lastChar As String, newChar As String, outString As String, randNumber As Integer
+  Dim lastChar As String, makeNumber As Integer, newChar As String, outString As String, randNumber As Integer
   For makeNumber = 0 To passCount - 1
     outString = ""
     Dim lengthNumber As Integer
@@ -446,7 +455,7 @@ Public Function isRegKey(inputKey As String)
   Set thisObject = CreateObject("WScript.Shell")
   On Error Resume Next
   isRegKey = False
-  thisKey = thisObject.regRead(inputKey)
+  thisKey = thisObject.RegRead(inputKey)
   If Err.Number = 0 Then
     isRegKey = True
   ElseIf thisKey = "" Then
@@ -464,58 +473,58 @@ Public Function saveToRegistry()
     Dim qS As Object
     Set qS = CreateObject("WScript.Shell")
     ' `-> q(uick)S(hell).
-    ' qS.regWrite ourPath & "useSave", useSave, "REG_DWORD"
-    qS.regWrite ourPath & "useUppercase", chkUpperChars.Value, "REG_DWORD"
-    qS.regWrite ourPath & "useLowercase", chkLowerChars.Value, "REG_DWORD"
-    qS.regWrite ourPath & "useNumbers", chkNumChars.Value, "REG_DWORD"
-    qS.regWrite ourPath & "useSpecials", chkSpecialChars.Value, "REG_DWORD"
-    qS.regWrite ourPath & "useSpace", chkSpaces.Value, "REG_DWORD"
-    qS.regWrite ourPath & "passCount", cmbNumber.Text, "REG_DWORD"
-    qS.regWrite ourPath & "passLength", cmbLength.Text, "REG_SZ"
-    qS.regWrite ourPath & "useAutomatic", chkAutomatic.Value, "REG_DWORD"
-    qS.regWrite ourPath & "useNoRepeat", chkNoRep.Value, "REG_DWORD"
-    qS.regWrite ourPath & "usePIM", chkPIM.Value, "REG_DWORD"
-    qS.regWrite ourPath & "PIM", cmbPIM.Text, "REG_DWORD"
+    ' qS.RegWrite ourPath & "useSave", useSave, "REG_DWORD"
+    qS.RegWrite ourPath & "useUppercase", chkUpperChars.Value, "REG_DWORD"
+    qS.RegWrite ourPath & "useLowercase", chkLowerChars.Value, "REG_DWORD"
+    qS.RegWrite ourPath & "useNumbers", chkNumChars.Value, "REG_DWORD"
+    qS.RegWrite ourPath & "useSpecials", chkSpecialChars.Value, "REG_DWORD"
+    qS.RegWrite ourPath & "useSpace", chkSpaces.Value, "REG_DWORD"
+    qS.RegWrite ourPath & "passCount", cmbNumber.Text, "REG_DWORD"
+    qS.RegWrite ourPath & "passLength", cmbLength.Text, "REG_SZ"
+    qS.RegWrite ourPath & "useAutomatic", chkAutomatic.Value, "REG_DWORD"
+    qS.RegWrite ourPath & "useNoRepeat", chkNoRep.Value, "REG_DWORD"
+    qS.RegWrite ourPath & "usePIM", chkPIM.Value, "REG_DWORD"
+    qS.RegWrite ourPath & "PIM", cmbPIM.Text, "REG_DWORD"
     ' ,-> Special(s).
-    qS.regWrite ourPath & "useExclamation", useExclamation, "REG_DWORD"
-    qS.regWrite ourPath & "useQuote", useQuote, "REG_DWORD"
-    qS.regWrite ourPath & "useHash", useHash, "REG_DWORD"
-    qS.regWrite ourPath & "useDollar", useDollar, "REG_DWORD"
-    qS.regWrite ourPath & "usePercent", usePercent, "REG_DWORD"
-    qS.regWrite ourPath & "useAmpersand", useAmpersand, "REG_DWORD"
-    qS.regWrite ourPath & "useApostrophe", useApostrophe, "REG_DWORD"
-    qS.regWrite ourPath & "useLeftParenthesis", useLeftParenthesis, "REG_DWORD"
-    qS.regWrite ourPath & "useRightParenthesis", useRightParenthesis, "REG_DWORD"
-    qS.regWrite ourPath & "useAsterisk", useAsterisk, "REG_DWORD"
-    qS.regWrite ourPath & "usePlus", usePlus, "REG_DWORD"
-    qS.regWrite ourPath & "useComma", useComma, "REG_DWORD"
-    qS.regWrite ourPath & "useMinus", useMinus, "REG_DWORD"
-    qS.regWrite ourPath & "usePeriod", usePeriod, "REG_DWORD"
-    qS.regWrite ourPath & "useForwardSlash", useForwardSlash, "REG_DWORD"
-    qS.regWrite ourPath & "useColon", useColon, "REG_DWORD"
-    qS.regWrite ourPath & "useSemiColon", useSemiColon, "REG_DWORD"
-    qS.regWrite ourPath & "useLessThan", useLessThan, "REG_DWORD"
-    qS.regWrite ourPath & "useEquals", useEquals, "REG_DWORD"
-    qS.regWrite ourPath & "useGreaterThan", useGreaterThan, "REG_DWORD"
-    qS.regWrite ourPath & "useQuestion", useQuestion, "REG_DWORD"
-    qS.regWrite ourPath & "useAtSign", useAtSign, "REG_DWORD"
-    qS.regWrite ourPath & "useLeftBracket", useLeftBracket, "REG_DWORD"
-    qS.regWrite ourPath & "useBackSlash", useBackSlash, "REG_DWORD"
-    qS.regWrite ourPath & "useRightBracket", useRightBracket, "REG_DWORD"
-    qS.regWrite ourPath & "usePower", usePower, "REG_DWORD"
-    qS.regWrite ourPath & "useUnderscore", useUnderscore, "REG_DWORD"
-    qS.regWrite ourPath & "useGrave", useGrave, "REG_DWORD"
-    qS.regWrite ourPath & "useLeftBrace", useLeftBrace, "REG_DWORD"
-    qS.regWrite ourPath & "usePipe", usePipe, "REG_DWORD"
-    qS.regWrite ourPath & "useRightBrace", useRightBrace, "REG_DWORD"
-    qS.regWrite ourPath & "useTilde", useTilde, "REG_DWORD"
+    qS.RegWrite ourPath & "useExclamation", useExclamation, "REG_DWORD"
+    qS.RegWrite ourPath & "useQuote", useQuote, "REG_DWORD"
+    qS.RegWrite ourPath & "useHash", useHash, "REG_DWORD"
+    qS.RegWrite ourPath & "useDollar", useDollar, "REG_DWORD"
+    qS.RegWrite ourPath & "usePercent", usePercent, "REG_DWORD"
+    qS.RegWrite ourPath & "useAmpersand", useAmpersand, "REG_DWORD"
+    qS.RegWrite ourPath & "useApostrophe", useApostrophe, "REG_DWORD"
+    qS.RegWrite ourPath & "useLeftParenthesis", useLeftParenthesis, "REG_DWORD"
+    qS.RegWrite ourPath & "useRightParenthesis", useRightParenthesis, "REG_DWORD"
+    qS.RegWrite ourPath & "useAsterisk", useAsterisk, "REG_DWORD"
+    qS.RegWrite ourPath & "usePlus", usePlus, "REG_DWORD"
+    qS.RegWrite ourPath & "useComma", useComma, "REG_DWORD"
+    qS.RegWrite ourPath & "useMinus", useMinus, "REG_DWORD"
+    qS.RegWrite ourPath & "usePeriod", usePeriod, "REG_DWORD"
+    qS.RegWrite ourPath & "useForwardSlash", useForwardSlash, "REG_DWORD"
+    qS.RegWrite ourPath & "useColon", useColon, "REG_DWORD"
+    qS.RegWrite ourPath & "useSemiColon", useSemiColon, "REG_DWORD"
+    qS.RegWrite ourPath & "useLessThan", useLessThan, "REG_DWORD"
+    qS.RegWrite ourPath & "useEquals", useEquals, "REG_DWORD"
+    qS.RegWrite ourPath & "useGreaterThan", useGreaterThan, "REG_DWORD"
+    qS.RegWrite ourPath & "useQuestion", useQuestion, "REG_DWORD"
+    qS.RegWrite ourPath & "useAtSign", useAtSign, "REG_DWORD"
+    qS.RegWrite ourPath & "useLeftBracket", useLeftBracket, "REG_DWORD"
+    qS.RegWrite ourPath & "useBackSlash", useBackSlash, "REG_DWORD"
+    qS.RegWrite ourPath & "useRightBracket", useRightBracket, "REG_DWORD"
+    qS.RegWrite ourPath & "usePower", usePower, "REG_DWORD"
+    qS.RegWrite ourPath & "useUnderscore", useUnderscore, "REG_DWORD"
+    qS.RegWrite ourPath & "useGrave", useGrave, "REG_DWORD"
+    qS.RegWrite ourPath & "useLeftBrace", useLeftBrace, "REG_DWORD"
+    qS.RegWrite ourPath & "usePipe", usePipe, "REG_DWORD"
+    qS.RegWrite ourPath & "useRightBrace", useRightBrace, "REG_DWORD"
+    qS.RegWrite ourPath & "useTilde", useTilde, "REG_DWORD"
     ' ,-> Override
-    qS.regWrite ourPath & "override128", IIf(maxPassLen = 128, 1, 0), "REG_DWORD"
-    qS.regWrite ourPath & "override256", IIf(maxPassLen = 256, 1, 0), "REG_DWORD"
-    qS.regWrite ourPath & "override512", IIf(maxPassLen = 512, 1, 0), "REG_DWORD"
-    qS.regWrite ourPath & "moreRandomness", moreRandomness, "REG_DWORD"
-    qS.regWrite ourPath & "limitPIM", IIf(passLenPIM = 64, 1, 0), "REG_DWORD"
-    qS.regWrite ourPath & "dropPIM", IIf(overridePIM = 92, 1, 0), "REG_DWORD"
+    qS.RegWrite ourPath & "override128", IIf(maxPassLen = 128, 1, 0), "REG_DWORD"
+    qS.RegWrite ourPath & "override256", IIf(maxPassLen = 256, 1, 0), "REG_DWORD"
+    qS.RegWrite ourPath & "override512", IIf(maxPassLen = 512, 1, 0), "REG_DWORD"
+    qS.RegWrite ourPath & "moreRandomness", moreRandomness, "REG_DWORD"
+    qS.RegWrite ourPath & "limitPIM", IIf(passLenPIM = 64, 1, 0), "REG_DWORD"
+    qS.RegWrite ourPath & "dropPIM", IIf(overridePIM = 92, 1, 0), "REG_DWORD"
   End If
 End Function
 
@@ -668,91 +677,91 @@ Private Sub Form_Load()
     Dim qS As Object
     ' `-> q(uick)S(hell)
     Set qS = CreateObject("WScript.Shell")
-    ' If isRegKey(ourPath & "useSave") = True Then useSave = isBool(qS.regRead(ourPath & "useSave"))
-    If isRegKey(ourPath & "useUppercase") = True Then chkUpperChars.Value = isBool(qS.regRead(ourPath & "useUppercase"))
-    If isRegKey(ourPath & "useLowercase") = True Then chkLowerChars.Value = isBool(qS.regRead(ourPath & "useLowercase"))
-    If isRegKey(ourPath & "useNumbers") = True Then chkNumChars.Value = isBool(qS.regRead(ourPath & "useNumbers"))
+    ' If isRegKey(ourPath & "useSave") = True Then useSave = isBool(qS.RegRead(ourPath & "useSave"))
+    If isRegKey(ourPath & "useUppercase") = True Then chkUpperChars.Value = isBool(qS.RegRead(ourPath & "useUppercase"))
+    If isRegKey(ourPath & "useLowercase") = True Then chkLowerChars.Value = isBool(qS.RegRead(ourPath & "useLowercase"))
+    If isRegKey(ourPath & "useNumbers") = True Then chkNumChars.Value = isBool(qS.RegRead(ourPath & "useNumbers"))
     ' -> See the note below!
-    If isRegKey(ourPath & "useSpace") = True Then chkSpaces.Value = isBool(qS.regRead(ourPath & "useSpace"))
+    If isRegKey(ourPath & "useSpace") = True Then chkSpaces.Value = isBool(qS.RegRead(ourPath & "useSpace"))
     ' ,-> Specials.
-    If isRegKey(ourPath & "useExclamation") = True Then useExclamation = isBool(qS.regRead(ourPath & "useExclamation"))
-    If isRegKey(ourPath & "useQuote") = True Then useQuote = isBool(qS.regRead(ourPath & "useQuote"))
-    If isRegKey(ourPath & "useHash") = True Then useHash = isBool(qS.regRead(ourPath & "useHash"))
-    If isRegKey(ourPath & "useDollar") = True Then useDollar = isBool(qS.regRead(ourPath & "useDollar"))
-    If isRegKey(ourPath & "usePercent") = True Then usePercent = isBool(qS.regRead(ourPath & "usePercent"))
-    If isRegKey(ourPath & "useAmpersand") = True Then useAmpersand = isBool(qS.regRead(ourPath & "useAmpersand"))
-    If isRegKey(ourPath & "useApostrophe") = True Then useApostrophe = isBool(qS.regRead(ourPath & "useApostrophe"))
-    If isRegKey(ourPath & "useLeftParenthesis") = True Then useLeftParenthesis = isBool(qS.regRead(ourPath & "useLeftParenthesis"))
-    If isRegKey(ourPath & "useRightParenthesis") = True Then useRightParenthesis = isBool(qS.regRead(ourPath & "useRightParenthesis"))
-    If isRegKey(ourPath & "useAsterisk") = True Then useAsterisk = isBool(qS.regRead(ourPath & "useAsterisk"))
-    If isRegKey(ourPath & "usePlus") = True Then usePlus = isBool(qS.regRead(ourPath & "usePlus"))
-    If isRegKey(ourPath & "useComma") = True Then useComma = isBool(qS.regRead(ourPath & "useComma"))
-    If isRegKey(ourPath & "useMinus") = True Then useMinus = isBool(qS.regRead(ourPath & "useMinus"))
-    If isRegKey(ourPath & "usePeriod") = True Then usePeriod = isBool(qS.regRead(ourPath & "usePeriod"))
-    If isRegKey(ourPath & "useForwardSlash") = True Then useForwardSlash = isBool(qS.regRead(ourPath & "useForwardSlash"))
-    If isRegKey(ourPath & "useColon") = True Then useColon = isBool(qS.regRead(ourPath & "useColon"))
-    If isRegKey(ourPath & "useSemiColon") = True Then useSemiColon = isBool(qS.regRead(ourPath & "useSemiColon"))
-    If isRegKey(ourPath & "useLessThan") = True Then useLessThan = isBool(qS.regRead(ourPath & "useLessThan"))
-    If isRegKey(ourPath & "useEquals") = True Then useEquals = isBool(qS.regRead(ourPath & "useEquals"))
-    If isRegKey(ourPath & "useGreaterThan") = True Then useGreaterThan = isBool(qS.regRead(ourPath & "useGreaterThan"))
-    If isRegKey(ourPath & "useQuestion") = True Then useQuestion = isBool(qS.regRead(ourPath & "useQuestion"))
-    If isRegKey(ourPath & "useAtSign") = True Then useAtSign = isBool(qS.regRead(ourPath & "useAtSign"))
-    If isRegKey(ourPath & "useLeftBracket") = True Then useLeftBracket = isBool(qS.regRead(ourPath & "useLeftBracket"))
-    If isRegKey(ourPath & "useBackSlash") = True Then useBackSlash = isBool(qS.regRead(ourPath & "useBackSlash"))
-    If isRegKey(ourPath & "useRightBracket") = True Then useRightBracket = isBool(qS.regRead(ourPath & "useRightBracket"))
-    If isRegKey(ourPath & "usePower") = True Then usePower = isBool(qS.regRead(ourPath & "usePower"))
-    If isRegKey(ourPath & "useUnderscore") = True Then useUnderscore = isBool(qS.regRead(ourPath & "useUnderscore"))
-    If isRegKey(ourPath & "useGrave") = True Then useGrave = isBool(qS.regRead(ourPath & "useGrave"))
-    If isRegKey(ourPath & "useLeftBrace") = True Then useLeftBrace = isBool(qS.regRead(ourPath & "useLeftBrace"))
-    If isRegKey(ourPath & "usePipe") = True Then usePipe = isBool(qS.regRead(ourPath & "usePipe"))
-    If isRegKey(ourPath & "useRightBrace") = True Then useRightBrace = isBool(qS.regRead(ourPath & "useRightBrace"))
-    If isRegKey(ourPath & "useTilde") = True Then useTilde = isBool(qS.regRead(ourPath & "useTilde"))
+    If isRegKey(ourPath & "useExclamation") = True Then useExclamation = isBool(qS.RegRead(ourPath & "useExclamation"))
+    If isRegKey(ourPath & "useQuote") = True Then useQuote = isBool(qS.RegRead(ourPath & "useQuote"))
+    If isRegKey(ourPath & "useHash") = True Then useHash = isBool(qS.RegRead(ourPath & "useHash"))
+    If isRegKey(ourPath & "useDollar") = True Then useDollar = isBool(qS.RegRead(ourPath & "useDollar"))
+    If isRegKey(ourPath & "usePercent") = True Then usePercent = isBool(qS.RegRead(ourPath & "usePercent"))
+    If isRegKey(ourPath & "useAmpersand") = True Then useAmpersand = isBool(qS.RegRead(ourPath & "useAmpersand"))
+    If isRegKey(ourPath & "useApostrophe") = True Then useApostrophe = isBool(qS.RegRead(ourPath & "useApostrophe"))
+    If isRegKey(ourPath & "useLeftParenthesis") = True Then useLeftParenthesis = isBool(qS.RegRead(ourPath & "useLeftParenthesis"))
+    If isRegKey(ourPath & "useRightParenthesis") = True Then useRightParenthesis = isBool(qS.RegRead(ourPath & "useRightParenthesis"))
+    If isRegKey(ourPath & "useAsterisk") = True Then useAsterisk = isBool(qS.RegRead(ourPath & "useAsterisk"))
+    If isRegKey(ourPath & "usePlus") = True Then usePlus = isBool(qS.RegRead(ourPath & "usePlus"))
+    If isRegKey(ourPath & "useComma") = True Then useComma = isBool(qS.RegRead(ourPath & "useComma"))
+    If isRegKey(ourPath & "useMinus") = True Then useMinus = isBool(qS.RegRead(ourPath & "useMinus"))
+    If isRegKey(ourPath & "usePeriod") = True Then usePeriod = isBool(qS.RegRead(ourPath & "usePeriod"))
+    If isRegKey(ourPath & "useForwardSlash") = True Then useForwardSlash = isBool(qS.RegRead(ourPath & "useForwardSlash"))
+    If isRegKey(ourPath & "useColon") = True Then useColon = isBool(qS.RegRead(ourPath & "useColon"))
+    If isRegKey(ourPath & "useSemiColon") = True Then useSemiColon = isBool(qS.RegRead(ourPath & "useSemiColon"))
+    If isRegKey(ourPath & "useLessThan") = True Then useLessThan = isBool(qS.RegRead(ourPath & "useLessThan"))
+    If isRegKey(ourPath & "useEquals") = True Then useEquals = isBool(qS.RegRead(ourPath & "useEquals"))
+    If isRegKey(ourPath & "useGreaterThan") = True Then useGreaterThan = isBool(qS.RegRead(ourPath & "useGreaterThan"))
+    If isRegKey(ourPath & "useQuestion") = True Then useQuestion = isBool(qS.RegRead(ourPath & "useQuestion"))
+    If isRegKey(ourPath & "useAtSign") = True Then useAtSign = isBool(qS.RegRead(ourPath & "useAtSign"))
+    If isRegKey(ourPath & "useLeftBracket") = True Then useLeftBracket = isBool(qS.RegRead(ourPath & "useLeftBracket"))
+    If isRegKey(ourPath & "useBackSlash") = True Then useBackSlash = isBool(qS.RegRead(ourPath & "useBackSlash"))
+    If isRegKey(ourPath & "useRightBracket") = True Then useRightBracket = isBool(qS.RegRead(ourPath & "useRightBracket"))
+    If isRegKey(ourPath & "usePower") = True Then usePower = isBool(qS.RegRead(ourPath & "usePower"))
+    If isRegKey(ourPath & "useUnderscore") = True Then useUnderscore = isBool(qS.RegRead(ourPath & "useUnderscore"))
+    If isRegKey(ourPath & "useGrave") = True Then useGrave = isBool(qS.RegRead(ourPath & "useGrave"))
+    If isRegKey(ourPath & "useLeftBrace") = True Then useLeftBrace = isBool(qS.RegRead(ourPath & "useLeftBrace"))
+    If isRegKey(ourPath & "usePipe") = True Then usePipe = isBool(qS.RegRead(ourPath & "usePipe"))
+    If isRegKey(ourPath & "useRightBrace") = True Then useRightBrace = isBool(qS.RegRead(ourPath & "useRightBrace"))
+    If isRegKey(ourPath & "useTilde") = True Then useTilde = isBool(qS.RegRead(ourPath & "useTilde"))
     Call makeSpecialString
-    If isRegKey(ourPath & "useSpecials") = True Then chkSpecialChars.Value = isBool(qS.regRead(ourPath & "useSpecials"))
+    If isRegKey(ourPath & "useSpecials") = True Then chkSpecialChars.Value = isBool(qS.RegRead(ourPath & "useSpecials"))
     ' `-> We have to do this one here otherwise makeSpecialString will enable it regardless of our choice...
     ' ,-> Override.
     If isRegKey(ourPath & "override128") = True Then
-      If isBool(qS.regRead(ourPath & "override128")) = 1 Then maxPassLen = 128
+      If isBool(qS.RegRead(ourPath & "override128")) = 1 Then maxPassLen = 128
     End If
     If isRegKey(ourPath & "override256") = True Then
-      If isBool(qS.regRead(ourPath & "override256")) = 1 And maxPassLen = defaultMaxPassLen Then maxPassLen = 256
+      If isBool(qS.RegRead(ourPath & "override256")) = 1 And maxPassLen = defaultMaxPassLen Then maxPassLen = 256
     End If
     If isRegKey(ourPath & "override512") = True Then
-      If isBool(qS.regRead(ourPath & "override512")) = 1 And maxPassLen = defaultMaxPassLen Then maxPassLen = 512
+      If isBool(qS.RegRead(ourPath & "override512")) = 1 And maxPassLen = defaultMaxPassLen Then maxPassLen = 512
     End If
-    ' `-> If on the off chance someone modifies the registry to include all three, it'll just default to 128. (Or 256?)
+    ' `-> If on the off chance someone modifies the registry to include all three, it'll just default to 128. (Or 256 if two.)
     If maxPassLen <> defaultMaxPassLen Then Call addLenNumbers
-    If isRegKey(ourPath & "moreRandomness") = True Then moreRandomness = isBool(qS.regRead(ourPath & "moreRandomness"))
+    If isRegKey(ourPath & "moreRandomness") = True Then moreRandomness = isBool(qS.RegRead(ourPath & "moreRandomness"))
     If isRegKey(ourPath & "limitPIM") = True Then
-      If isBool(qS.regRead(ourPath & "limitPIM")) = 1 Then passLenPIM = 64
+      If isBool(qS.RegRead(ourPath & "limitPIM")) = 1 Then passLenPIM = 64
     End If
     If isRegKey(ourPath & "dropPIM") = True Then
-      If isBool(qS.regRead(ourPath & "dropPIM")) = 1 Then overridePIM = 92
+      If isBool(qS.RegRead(ourPath & "dropPIM")) = 1 Then overridePIM = 92
     End If
     ' ,-> Lastly...
     If isRegKey(ourPath & "passCount") = True Then
-      If IsNumeric(qS.regRead(ourPath & "passCount")) = True Then
+      If IsNumeric(qS.RegRead(ourPath & "passCount")) = True Then
         Dim tempPassCount As Integer
-        tempPassCount = qS.regRead(ourPath & "passCount")
+        tempPassCount = qS.RegRead(ourPath & "passCount")
         If tempPassCount > 0 And tempPassCount <= maxPassCount Then cmbNumber.Text = tempPassCount
       End If
     End If
     If isRegKey(ourPath & "passLength") = True Then
       Dim tempPassLength As Variant
-      tempPassLength = qS.regRead(ourPath & "passLength")
+      tempPassLength = qS.RegRead(ourPath & "passLength")
       If IsNumeric(tempPassLength) = True Then
         If tempPassLength > 0 And tempPassLength <= maxPassLen Then cmbLength.Text = tempPassLength
       Else
         If tempPassLength = "Rand" Then cmbLength.Text = tempPassLength
       End If
     End If
-    If isRegKey(ourPath & "useAutomatic") = True Then chkAutomatic.Value = isBool(qS.regRead(ourPath & "useAutomatic"))
-    If isRegKey(ourPath & "useNoRepeat") = True Then chkNoRep.Value = isBool(qS.regRead(ourPath & "useNoRepeat"))
-    If isRegKey(ourPath & "usePIM") = True Then chkPIM.Value = isBool(qS.regRead(ourPath & "usePIM"))
+    If isRegKey(ourPath & "useAutomatic") = True Then chkAutomatic.Value = isBool(qS.RegRead(ourPath & "useAutomatic"))
+    If isRegKey(ourPath & "useNoRepeat") = True Then chkNoRep.Value = isBool(qS.RegRead(ourPath & "useNoRepeat"))
+    If isRegKey(ourPath & "usePIM") = True Then chkPIM.Value = isBool(qS.RegRead(ourPath & "usePIM"))
     If isRegKey(ourPath & "PIM") = True Then
-      If IsNumeric(qS.regRead(ourPath & "PIM")) = True Then
+      If IsNumeric(qS.RegRead(ourPath & "PIM")) = True Then
         Dim tempPIM As Integer
-        tempPIM = qS.regRead(ourPath & "PIM")
+        tempPIM = qS.RegRead(ourPath & "PIM")
         If tempPIM >= cmbPIM.List(0) And tempPIM <= cmbPIM.List(cmbPIM.ListCount - 1) Then cmbPIM.Text = tempPIM
       End If
     End If
@@ -800,6 +809,10 @@ End Sub
 
 Private Sub menuSpecial_Click()
   frmSpecial.Visible = True
+End Sub
+
+Private Sub menuWebsite_Click()
+  CreateObject("WScript.Shell").Run frmAbout.lblLink.Caption
 End Sub
 
 Private Sub tmrAutomatic_Timer()
