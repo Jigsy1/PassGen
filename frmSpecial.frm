@@ -12,6 +12,14 @@ Begin VB.Form frmSpecial
    ScaleHeight     =   3000
    ScaleWidth      =   6480
    StartUpPosition =   1  'CenterOwner
+   Begin VB.CommandButton cmdExclude 
+      Caption         =   "&Exclude All"
+      Height          =   375
+      Left            =   1560
+      TabIndex        =   33
+      Top             =   2520
+      Width           =   1335
+   End
    Begin VB.CommandButton cmdIncludeAll 
       Caption         =   "&Include All"
       Height          =   375
@@ -24,7 +32,7 @@ Begin VB.Form frmSpecial
       Caption         =   "&OK"
       Height          =   375
       Left            =   5040
-      TabIndex        =   33
+      TabIndex        =   34
       Top             =   2520
       Width           =   1335
    End
@@ -32,7 +40,7 @@ Begin VB.Form frmSpecial
       Caption         =   "Include:"
       Height          =   2295
       Left            =   120
-      TabIndex        =   34
+      TabIndex        =   35
       Top             =   120
       Width           =   6255
       Begin VB.CheckBox chkUnderscore 
@@ -456,6 +464,42 @@ End Sub
 
 Private Sub chkUnderscore_Click()
   frmPassGen.useUnderscore = chkUnderscore.Value
+End Sub
+
+Private Sub cmdExclude_Click()
+  If chkExclamation.Value = 1 Then chkExclamation.Value = 0
+  If chkQuote.Value = 1 Then chkQuote.Value = 0
+  If chkHash.Value = 1 Then chkHash.Value = 0
+  If chkDollar.Value = 1 Then chkDollar.Value = 0
+  If chkPercent.Value = 1 Then chkPercent.Value = 0
+  If chkAmpersand.Value = 1 Then chkAmpersand.Value = 0
+  If chkApostrophe.Value = 1 Then chkApostrophe.Value = 0
+  If chkLeftParenthesis.Value = 1 Then chkLeftParenthesis.Value = 0
+  If chkRightParenthesis.Value = 1 Then chkRightParenthesis.Value = 0
+  If chkAsterisk.Value = 1 Then chkAsterisk.Value = 0
+  If chkPlus.Value = 1 Then chkPlus.Value = 0
+  If chkComma.Value = 1 Then chkComma.Value = 0
+  If chkMinus.Value = 1 Then chkMinus.Value = 0
+  If chkPeriod.Value = 1 Then chkPeriod.Value = 0
+  If chkForwardSlash.Value = 1 Then chkForwardSlash.Value = 0
+  If chkColon.Value = 1 Then chkColon.Value = 0
+  If chkSemiColon.Value = 1 Then chkSemiColon.Value = 0
+  If chkLessThan.Value = 1 Then chkLessThan.Value = 0
+  If chkEquals.Value = 1 Then chkEquals.Value = 0
+  If chkGreaterThan.Value = 1 Then chkGreaterThan.Value = 0
+  If chkQuestion.Value = 1 Then chkQuestion.Value = 0
+  If chkAtSign.Value = 1 Then chkAtSign.Value = 0
+  If chkLeftBracket.Value = 1 Then chkLeftBracket.Value = 0
+  If chkBackSlash.Value = 1 Then chkBackSlash.Value = 0
+  If chkRightBracket.Value = 1 Then chkRightBracket.Value = 0
+  If chkPower.Value = 1 Then chkPower.Value = 0
+  If chkUnderscore.Value = 1 Then chkUnderscore.Value = 0
+  If chkGrave.Value = 1 Then chkGrave.Value = 0
+  If chkLeftBrace.Value = 1 Then chkLeftBrace.Value = 0
+  If chkPipe.Value = 1 Then chkPipe.Value = 0
+  If chkRightBrace.Value = 1 Then chkRightBrace.Value = 0
+  If chkTilde.Value = 1 Then chkTilde.Value = 0
+  ' `-> ASCII table order.
 End Sub
 
 Private Sub cmdIncludeAll_Click()

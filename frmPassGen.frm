@@ -322,6 +322,11 @@ Public Function addLenNumbers()
   ' `-> The minimum is eight, but nobody should really be using sub 16 character passwords in 2022.
 End Function
 
+Private Function resetTimer()
+  tmrAutomatic.Enabled = False
+  tmrAutomatic.Enabled = True
+End Function
+
 Private Function makePass(passCount As Integer, inputLength As Variant)
   Randomize Timer
   Dim baseString As String
@@ -575,6 +580,7 @@ Private Sub cmdGenerate_Click()
     ' `-> Do not include chkSpace here because it would offer no differences.
   Else
     Call makePass(cmbNumber.Text, cmbLength.Text)
+    If tmrAutomatic.Enabled = True Then Call resetTimer
   End If
 End Sub
 
@@ -595,7 +601,10 @@ End Sub
 
 Private Sub Form_KeyDown(KeyCode As Integer, Shift As Integer)
   If KeyCode = vbKeyF5 Then
-    If chkUpperChars.Value <> 0 Or chkLowerChars.Value <> 0 Or chkNumChars.Value <> 0 Or chkSpecialChars.Value <> 0 Then Call makePass(cmbNumber.Text, cmbLength.Text)
+    If chkUpperChars.Value <> 0 Or chkLowerChars.Value <> 0 Or chkNumChars.Value <> 0 Or chkSpecialChars.Value <> 0 Then
+      Call makePass(cmbNumber.Text, cmbLength.Text)
+      If tmrAutomatic.Enabled = True Then Call resetTimer
+    End If
   End If
   If KeyCode = vbKeyDelete Then lstPasswords.Clear
 End Sub

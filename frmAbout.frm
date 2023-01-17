@@ -64,7 +64,7 @@ Private Sub Form_KeyPress(KeyAscii As Integer)
 End Sub
 
 Private Sub Form_Load()
-  Me.Caption = Me.Caption & " " & frmPassGen.Caption
+  Me.Caption = Me.Caption & " " & frmPassGen.Tag
 End Sub
 
 Private Sub Form_Terminate()
