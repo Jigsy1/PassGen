@@ -2,67 +2,75 @@ VERSION 5.00
 Begin VB.Form frmPassGen 
    BorderStyle     =   1  'Fixed Single
    Caption         =   "Password Generator"
-   ClientHeight    =   4200
+   ClientHeight    =   4560
    ClientLeft      =   45
    ClientTop       =   615
    ClientWidth     =   12000
    KeyPreview      =   -1  'True
    LinkTopic       =   "Form1"
    MaxButton       =   0   'False
-   ScaleHeight     =   4200
+   ScaleHeight     =   4560
    ScaleWidth      =   12000
    StartUpPosition =   2  'CenterScreen
    Begin VB.CommandButton cmdSelect 
       Caption         =   "Se&lect All"
       Height          =   375
       Left            =   2040
-      TabIndex        =   13
-      Top             =   3720
+      TabIndex        =   14
+      Top             =   4080
       Width           =   1335
    End
    Begin VB.Timer tmrAutomatic 
       Enabled         =   0   'False
       Interval        =   60000
       Left            =   9960
-      Top             =   3720
+      Top             =   4080
    End
    Begin VB.Timer tmrNoteClear 
       Enabled         =   0   'False
       Interval        =   2000
       Left            =   9480
-      Top             =   3720
+      Top             =   4080
    End
    Begin VB.CommandButton cmdClose 
       Caption         =   "&Close"
       Height          =   375
       Left            =   10560
-      TabIndex        =   16
-      Top             =   3720
+      TabIndex        =   17
+      Top             =   4080
       Width           =   1335
    End
    Begin VB.CommandButton cmdCopy 
       Caption         =   "C&opy"
       Height          =   375
       Left            =   3480
-      TabIndex        =   14
-      Top             =   3720
+      TabIndex        =   15
+      Top             =   4080
       Width           =   1335
    End
    Begin VB.CommandButton cmdGenerate 
       Caption         =   "&Generate (F5)"
       Height          =   375
       Left            =   120
-      TabIndex        =   12
-      Top             =   3720
+      TabIndex        =   13
+      Top             =   4080
       Width           =   1335
    End
    Begin VB.Frame fmeString 
       Caption         =   "Extra:"
-      Height          =   1935
+      Height          =   2295
       Left            =   120
-      TabIndex        =   18
+      TabIndex        =   19
       Top             =   1680
       Width           =   3855
+      Begin VB.CheckBox chkAvoidSpace 
+         Caption         =   "Avoid using space on the first/last character(s)"
+         Height          =   255
+         Left            =   120
+         TabIndex        =   10
+         Top             =   1550
+         Width           =   3615
+      End
       Begin VB.CheckBox chkNoRep 
          Caption         =   "Avoid using the same character in succession"
          Height          =   255
@@ -77,17 +85,17 @@ Begin VB.Form frmPassGen
          Left            =   2760
          List            =   "frmPassGen.frx":0019
          Style           =   2  'Dropdown List
-         TabIndex        =   11
-         Top             =   1520
+         TabIndex        =   12
+         Top             =   1875
          Width           =   975
       End
       Begin VB.CheckBox chkPIM 
          Caption         =   "Include a random PIM from 1 to "
          Height          =   255
          Left            =   120
-         TabIndex        =   10
+         TabIndex        =   11
          ToolTipText     =   "Note: For when making VeraCrypt file(s)/volume(s)"
-         Top             =   1560
+         Top             =   1920
          Width           =   3615
       End
       Begin VB.CheckBox chkAutomatic 
@@ -118,7 +126,7 @@ Begin VB.Form frmPassGen
          Caption         =   "That are a length of                              characters"
          Height          =   255
          Left            =   120
-         TabIndex        =   20
+         TabIndex        =   21
          Top             =   640
          Width           =   3615
       End
@@ -126,16 +134,16 @@ Begin VB.Form frmPassGen
          Caption         =   "Generate a total of                                password(s)"
          Height          =   255
          Left            =   120
-         TabIndex        =   19
+         TabIndex        =   20
          Top             =   280
          Width           =   3615
       End
    End
    Begin VB.ListBox lstPasswords 
-      Height          =   3570
+      Height          =   3960
       Left            =   4080
       MultiSelect     =   2  'Extended
-      TabIndex        =   15
+      TabIndex        =   16
       Top             =   0
       Width           =   7815
    End
@@ -143,7 +151,7 @@ Begin VB.Form frmPassGen
       Caption         =   "Include:"
       Height          =   1575
       Left            =   120
-      TabIndex        =   17
+      TabIndex        =   18
       Top             =   0
       Width           =   3855
       Begin VB.CommandButton cmdSpecial 
@@ -237,6 +245,13 @@ Begin VB.Form frmPassGen
          Shortcut        =   ^W
       End
    End
+   Begin VB.Menu menuHelp 
+      Caption         =   "&Help"
+      Begin VB.Menu menuHotkeys 
+         Caption         =   "Hot&keys"
+         Shortcut        =   ^H
+      End
+   End
 End
 Attribute VB_Name = "frmPassGen"
 Attribute VB_GlobalNameSpace = False
@@ -319,7 +334,7 @@ Public Function addLenNumbers()
   Next lengthNumber
   cmbLength.AddItem "Rand"
   cmbLength.Text = IIf(IsNull(cmbLength.Tag) = False And cmbLength.Tag <> "", cmbLength.Tag, 16)
-  ' `-> The minimum is eight, but nobody should really be using sub 16 character passwords in 2022.
+  ' `-> The minimum is eight, but nobody should really be using sub 16 character passwords in 2022 onwards.
 End Function
 
 Private Function resetTimer()
@@ -342,12 +357,15 @@ Private Function makePass(passCount As Integer, inputLength As Variant)
   isRand = 0
   If inputLength = "Rand" Then isRand = 1
   lstPasswords.Clear
-  Dim lastChar As String, makeNumber As Integer, newChar As String, outString As String, randNumber As Integer
+  Dim lastChar As String, makeNumber As Integer, newChar As String, outString As String, randNumber As Integer, skipFlag As Integer
+  skipFlag = 0
+  ' `-> For skipping spaces on first and last.
   For makeNumber = 0 To passCount - 1
     outString = ""
     Dim lengthNumber As Integer
     If isRand = 1 Then inputLength = Int(Val(minPassLen + Val(Rnd * Val(maxPassLen - Val(minPassLen - 1)))))
     For lengthNumber = 0 To inputLength - 1
+      If skipFlag = 1 Then skipFlag = 0
       If moreRandomness = 1 Then
         randNumber = Int(Val(1 + Val(Rnd * 6)))
         Select Case randNumber
@@ -371,21 +389,31 @@ Private Function makePass(passCount As Integer, inputLength As Variant)
       Else
         newChar = Mid(baseString, Int(Val(1 + Val(Rnd * Len(baseString)))), 1)
       End If
-    If chkNoRep.Value = 1 Then
-      If lastChar <> "" Then
-        If lastChar = newChar Then
-          ' `-> Do it again.
+    If chkAvoidSpace.Value = 1 Then
+      If lengthNumber = 0 Or lengthNumber = inputLength - 1 Then
+        If newChar = " " Then
           lengthNumber = lengthNumber - 1
+          skipFlag = 1
+        End If
+      End If
+    End If
+    If skipFlag = 0 Then
+      If chkNoRep.Value = 1 Then
+        If lastChar <> "" Then
+          If lastChar = newChar Then
+            ' `-> Do it again.
+            lengthNumber = lengthNumber - 1
+          Else
+            outString = outString & newChar
+            lastChar = newChar
+          End If
         Else
           outString = outString & newChar
           lastChar = newChar
         End If
       Else
         outString = outString & newChar
-        lastChar = newChar
       End If
-    Else
-      outString = outString & newChar
     End If
     Next lengthNumber
     If chkPIM.Value = 1 Then
@@ -488,6 +516,7 @@ Public Function saveToRegistry()
     qS.RegWrite ourPath & "passLength", cmbLength.Text, "REG_SZ"
     qS.RegWrite ourPath & "useAutomatic", chkAutomatic.Value, "REG_DWORD"
     qS.RegWrite ourPath & "useNoRepeat", chkNoRep.Value, "REG_DWORD"
+    qS.RegWrite ourPath & "useAvoidSpaces", chkAvoidSpace.Value, "REG_DWORD"
     qS.RegWrite ourPath & "usePIM", chkPIM.Value, "REG_DWORD"
     qS.RegWrite ourPath & "PIM", cmbPIM.Text, "REG_DWORD"
     ' ,-> Special(s).
@@ -766,6 +795,7 @@ Private Sub Form_Load()
     End If
     If isRegKey(ourPath & "useAutomatic") = True Then chkAutomatic.Value = isBool(qS.RegRead(ourPath & "useAutomatic"))
     If isRegKey(ourPath & "useNoRepeat") = True Then chkNoRep.Value = isBool(qS.RegRead(ourPath & "useNoRepeat"))
+    If isRegKey(ourPath & "useAvoidSpaces") = True Then chkAvoidSpace.Value = isBool(qS.RegRead(ourPath & "useAvoidSpaces"))
     If isRegKey(ourPath & "usePIM") = True Then chkPIM.Value = isBool(qS.RegRead(ourPath & "usePIM"))
     If isRegKey(ourPath & "PIM") = True Then
       If IsNumeric(qS.RegRead(ourPath & "PIM")) = True Then
@@ -796,6 +826,10 @@ End Sub
 Private Sub menuExit_Click()
   Call saveToRegistry
   End
+End Sub
+
+Private Sub menuHotkeys_Click()
+  MsgBox "F5  - Generate (new) password(s)" & vbNewLine & "Del - Clear the password list" & vbNewLine & vbNewLine & "Esc - Close (sub)forms or end program", vbInformation, "Hotkeys"
 End Sub
 
 Private Sub menuOverride_Click()

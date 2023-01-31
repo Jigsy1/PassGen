@@ -1,6 +1,6 @@
 Type=Exe
 Form=frmPassGen.frm
-Reference=*\G{00020430-0000-0000-C000-000000000046}#2.0#0#..\..\..\..\..\WINXP\system32\stdole2.tlb#OLE Automation
+Reference=*\G{00020430-0000-0000-C000-000000000046}#2.0#0#..\..\..\WINXP\system32\stdole2.tlb#OLE Automation
 Form=frmSpecial.frm
 Form=frmOverride.frm
 Form=frmAbout.frm
@@ -15,7 +15,7 @@ HelpContextID="0"
 CompatibleMode="0"
 MajorVer=1
 MinorVer=2
-RevisionVer=0
+RevisionVer=1
 AutoIncrementVer=0
 ServerSupportFiles=0
 VersionCompanyName="Jigsy"

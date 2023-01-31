@@ -1,3 +1,10 @@
+v1.2.1:
+----------
+I realized that I incremented the version number incorrectly after the last version. Sadly, I'm now stuck with it. Now with that out of the way...
+
+1. Added an option to avoid using space on the first and last characters in the password.
+2. Added a simple "Help" MsgBox which lists the hotkeys that can be used.
+
 v1.2.0:
 ----------
 1. Fixed a very minor glitch.
