@@ -86,7 +86,7 @@ Begin VB.Form frmPassGen
          List            =   "frmPassGen.frx":0019
          Style           =   2  'Dropdown List
          TabIndex        =   12
-         Top             =   1875
+         Top             =   1865
          Width           =   975
       End
       Begin VB.CheckBox chkPIM 
@@ -95,7 +95,7 @@ Begin VB.Form frmPassGen
          Left            =   120
          TabIndex        =   11
          ToolTipText     =   "Note: For when making VeraCrypt file(s)/volume(s)"
-         Top             =   1920
+         Top             =   1895
          Width           =   3615
       End
       Begin VB.CheckBox chkAutomatic 
@@ -156,10 +156,10 @@ Begin VB.Form frmPassGen
       Width           =   3855
       Begin VB.CommandButton cmdSpecial 
          Caption         =   "?"
-         Height          =   315
-         Left            =   3360
+         Height          =   290
+         Left            =   3480
          TabIndex        =   4
-         Top             =   920
+         Top             =   915
          Width           =   255
       End
       Begin VB.CheckBox chkSpaces 
@@ -177,7 +177,7 @@ Begin VB.Form frmPassGen
          TabIndex        =   3
          Top             =   960
          Value           =   1  'Checked
-         Width           =   3015
+         Width           =   3255
       End
       Begin VB.CheckBox chkNumChars 
          Caption         =   "Numbers (0...9)"
@@ -231,25 +231,28 @@ Begin VB.Form frmPassGen
          Caption         =   "&Save Settings to Registry on Exit for Next Time"
       End
    End
-   Begin VB.Menu menuAbout 
-      Caption         =   "&About"
-      Begin VB.Menu menuAboutForm 
-         Caption         =   "&License"
-         Shortcut        =   ^L
-      End
-      Begin VB.Menu menuSeparatorB 
-         Caption         =   "-"
-      End
-      Begin VB.Menu menuWebsite 
-         Caption         =   "&Website..."
-         Shortcut        =   ^W
-      End
-   End
    Begin VB.Menu menuHelp 
       Caption         =   "&Help"
       Begin VB.Menu menuHotkeys 
          Caption         =   "Hot&keys"
          Shortcut        =   ^H
+      End
+      Begin VB.Menu menuSeparatorB 
+         Caption         =   "-"
+      End
+      Begin VB.Menu menuAbout 
+         Caption         =   "&About"
+         Begin VB.Menu menuAboutForm 
+            Caption         =   "&License"
+            Shortcut        =   ^L
+         End
+         Begin VB.Menu menuSeparatorC 
+            Caption         =   "-"
+         End
+         Begin VB.Menu menuWebsite 
+            Caption         =   "&Website..."
+            Shortcut        =   ^W
+         End
       End
    End
 End
@@ -465,6 +468,7 @@ Public Function makeSpecialString() As String
   If useRightBrace = 1 Then baseString = baseString & "}"
   If useTilde = 1 Then baseString = baseString & "~"
   ' `-> ASCII table order.
+  chkSpecialChars.Caption = chkSpecialChars.Tag & " - (" & Len(baseString) & ")"
   specialString = baseString
   If IsNull(baseString) = True Or baseString = "" Or Len(baseString) < specialsNeeded Then
     chkSpecialChars.Value = 0
@@ -648,6 +652,7 @@ End Sub
 Private Sub Form_Load()
   Me.Caption = Me.Caption & " v" & App.Major & "." & App.Minor & "." & App.Revision
   Me.Tag = Me.Caption
+  chkSpecialChars.Tag = chkSpecialChars.Caption
   ' ,-> Set the default global variable(s).
   useExclamation = 1
   useQuote = 1

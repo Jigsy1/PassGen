@@ -1,4 +1,4 @@
-PassGen v1.1.0.1 by Jigsy (https://github.com/Jigsy1) released under The Unlicense.
+PassGen v1.2.2 by Jigsy (https://github.com/Jigsy1) released under The Unlicense.
 
 Compatible with:
   * Windows 98 SE (requires MSVBVM60.dll)
@@ -53,9 +53,10 @@ Also under the override form is an option to increase the randomness of the pass
   is sufficient.
 
 
-Another three options on the main form are "Automatically generate new password(s) (60s)" which is pretty self-explainatory,
-  "Avoid using the same characters in succession," which will prevent things like, for example, ABBA (in which B follows B) and,
-  "Include a random PIM from 1 to <N>."
+Another four options on the main form are "Automatically generate new password(s) (60s)" which is pretty self-explainatory,
+  "Avoid using the same characters in succession," which will prevent things like, for example, ABBA (in which B follows B),
+  "Avoid using space on the first/last character(s)," which will prevent any passwords where Space is included from using space on the first and last character,
+  and "Include a random PIM from 1 to <N>."
 If you're a user of VeraCrypt, you can include a random number (a PIM) after your password for use in file(s) or volumes(s).
   This will appear as: <password> ------------ <N>
 

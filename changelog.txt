@@ -1,3 +1,8 @@
+v1.2.2:
+----------
+1. Just cosmetic changes. About is now under "Help" in the Menu.
+2. The number of special characters enabled appears in (...) next to the caption and before the [?] button.
+
 v1.2.1:
 ----------
 I realized that I incremented the version number incorrectly after the last version. Sadly, I'm now stuck with it. Now with that out of the way...
